@@ -1,0 +1,1180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Make More Machines - software</title><link href="http://www.agapow.net/" rel="alternate"></link><link href="http://www.agapow.net/feeds/software.atom.xml" rel="self"></link><id>http://www.agapow.net/</id><updated>2016-05-25T12:00:00+01:00</updated><entry><title>simpleredcapbuilder</title><link href="http://www.agapow.net/software/simpleredcapbuilder/" rel="alternate"></link><published>2016-05-25T12:00:00+01:00</published><updated>2016-05-25T12:00:00+01:00</updated><author><name>Paul Agapow</name></author><id>tag:www.agapow.net,2016-05-25:/software/simpleredcapbuilder/</id><summary type="html">&lt;div class="section" id="background"&gt;
+&lt;h2&gt;Background&lt;/h2&gt;
+&lt;p&gt;REDCap is a fabulously useful tool for creating web databases, including a
+useful scheme for defining the database schema (&amp;quot;data dictionaries&amp;quot;) in plain
+CSV files. However, difficulties arise when designing complex schema. It
+is cumbersome to code multiuple occurences of essentially the same field (e.g.
+&lt;tt class="docutils literal"&gt;sample_1 ... sample_2 ...&lt;/tt&gt;). If …&lt;/p&gt;&lt;/div&gt;</summary><content type="html">&lt;div class="section" id="background"&gt;
+&lt;h2&gt;Background&lt;/h2&gt;
+&lt;p&gt;REDCap is a fabulously useful tool for creating web databases, including a
+useful scheme for defining the database schema (&amp;quot;data dictionaries&amp;quot;) in plain
+CSV files. However, difficulties arise when designing complex schema. It
+is cumbersome to code multiuple occurences of essentially the same field (e.g.
+&lt;tt class="docutils literal"&gt;sample_1 ... sample_2 ...&lt;/tt&gt;). If changes need to be made, keeping wording and
+behaviour consistent across multiple instances is tedious. If a number of
+similar databases have to be deployed, the consistency problem is multipled.&lt;/p&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;simpleredcapbuilder&lt;/tt&gt; allows you to write REDCap schema in a more compact
+form that allows for repetition of rows, sections and forms (instruments), with
+straightforward text substitution into the repeats. It allows make checks on
+the schema, looking for possibly invalid values.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="installation"&gt;
+&lt;h2&gt;Installation&lt;/h2&gt;
+&lt;p&gt;simpleredcapbuilder can be downloaded from the repo and installed in the usual sort of ways:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p class="first"&gt;Download the repo, unpack it if necessary and use &lt;tt class="docutils literal"&gt;setup.py&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+% python setup.py install
+&lt;/pre&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p class="first"&gt;Use a package manager pointed at the git repository:&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+&amp;gt; pip install git+https://github.com/agapow/simpleredcapbuilder.git
+&lt;/pre&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;simpleredcapbuilder has been built under Python3 but should run under Python2.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="usage"&gt;
+&lt;h2&gt;Usage&lt;/h2&gt;
+&lt;p&gt;simpleredcapbuilder installs a single script, that is called:&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+usage: expand-redcap-schema [-h] [-o OUTFILE] infile
+
+positional arguments:
+  infile                compact REDCap file to be processed
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -o OUTFILE, --outfile OUTFILE
+                        output expanded redcap data dictionary
+&lt;/pre&gt;
+&lt;p&gt;This accepts a &amp;quot;compact&amp;quot; REDCap data dictionary, which allows which actually follows the
+form of the standard data dictionary with two additional columns: &lt;tt class="docutils literal"&gt;tags&lt;/tt&gt; and
+&lt;tt class="docutils literal"&gt;repeat&lt;/tt&gt;. (Note: the &lt;tt class="docutils literal"&gt;tags&lt;/tt&gt; column is not currently used.). The &lt;tt class="docutils literal"&gt;repeat&lt;/tt&gt;
+column says whether the row, or section or form starting with that row, should
+be repeated. For example:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;1-7&lt;/span&gt;&lt;/tt&gt;&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;item: 'A', 'B', 'C'&lt;/tt&gt;&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;section: 'foo', 'bar', 'baz'&lt;/tt&gt;&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;form: (1, &lt;span class="pre"&gt;'one'),&lt;/span&gt; (2, &lt;span class="pre"&gt;'two'),&lt;/span&gt; (3, 'three')&lt;/tt&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;That is, the repeat element starts with a qualifier saying whether the repeat is
+for the row, section or form. If no qualifier is given, it is assumed to be for the item. This is followed by either a range of numbers, or a sequence of values. (The sequence is anything that when enclosed in square braces will
+look like a legal list to Python.)&lt;/p&gt;
+&lt;p&gt;When this data dictionary is expanded, the associated items will be repeated. See the example &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;simple-but-useless&lt;/span&gt;&lt;/tt&gt; for an illustration.&lt;/p&gt;
+&lt;p&gt;Obviously, simply repeating a row or section is useless: variable identifiers
+will be repeated, fields will have the same name, etc. simpleredcapbuildergets around this problem by embedding and interpreting a template language (jinja2)
+in the data dictionary. For example, an item may have the repeat value of &lt;tt class="docutils literal"&gt;item: &lt;span class="pre"&gt;1-3&lt;/span&gt;&lt;/tt&gt; and the variable name of &lt;tt class="docutils literal"&gt;sample_{{ i_iter }}&lt;/tt&gt; and the field
+label of &lt;tt class="docutils literal"&gt;Sample number {[ i_iter ]}&lt;/tt&gt;. These will result in three rows,
+named and labelled:&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+sample_1 ... Sample number 1
+sample_2 ... Sample number 2
+sample_3 ... Sample number 3
+&lt;/pre&gt;
+&lt;p&gt;The sequence of values used in any repeat loop are &lt;tt class="docutils literal"&gt;i_iter&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;s_iter&lt;/tt&gt; and
+&lt;tt class="docutils literal"&gt;f_iter&lt;/tt&gt; for item, section and form repeats respectively. See the example &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;simple-and-useful&lt;/span&gt;&lt;/tt&gt; for an illustration.&lt;/p&gt;
+&lt;p&gt;More complex transformations are possible and you are referred to the Jinja documentation.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="references"&gt;
+&lt;h2&gt;References&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference external" href="https://github.com/agapow/simpleredcapbuilder"&gt;simpleredcapbuilder code repository&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="http://jinja.pocoo.org/"&gt;Jinja2 templating system&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+</content><category term="software"></category><category term="python"></category><category term="database"></category><category term="redcap"></category></entry><entry><title>Py-konval</title><link href="http://www.agapow.net/software/py-konval/" rel="alternate"></link><published>2012-03-01T12:00:00+00:00</published><updated>2012-03-01T12:00:00+00:00</updated><author><name>Paul Agapow</name></author><id>tag:www.agapow.net,2012-03-01:/software/py-konval/</id><summary type="html">&lt;div class="admonition note"&gt;
+&lt;p class="first admonition-title"&gt;Note&lt;/p&gt;
+&lt;p class="last"&gt;This package has been taken over by TODO, who has substantially re-engineered it and chnaged some of the API. This page is maintained for largely historical purposes.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="background"&gt;
+&lt;h2&gt;Background&lt;/h2&gt;
+&lt;p&gt;The problem of sanitizing data (checking correctness and transforming to
+a useful form) is widespread throughout programming:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;How do I verify …&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;</summary><content type="html">&lt;div class="admonition note"&gt;
+&lt;p class="first admonition-title"&gt;Note&lt;/p&gt;
+&lt;p class="last"&gt;This package has been taken over by TODO, who has substantially re-engineered it and chnaged some of the API. This page is maintained for largely historical purposes.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="background"&gt;
+&lt;h2&gt;Background&lt;/h2&gt;
+&lt;p&gt;The problem of sanitizing data (checking correctness and transforming to
+a useful form) is widespread throughout programming:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;How do I verify user input is correct?&lt;/li&gt;
+&lt;li&gt;How do I munge data from a spreadsheet into dates and numbers?&lt;/li&gt;
+&lt;li&gt;How do I convert raw database fields into a programmatic object?&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Ian Bicking came up with a sensible idiom for this problem, embodied in
+his Formencode library: validation and conversion are one and the same thing, and can be handled
+by passing raw data through a chain of validators. Each validator checks
+and/or transforms the data and passes it on to the next.&lt;/p&gt;
+&lt;p&gt;In this spirit, &lt;em&gt;konval&lt;/em&gt; is a package that provides:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;a rich library of validation objects&lt;/li&gt;
+&lt;li&gt;base classes for easily producing custom validators&lt;/li&gt;
+&lt;li&gt;functions for easily using validators in a variety of ways&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;em&gt;konval&lt;/em&gt; is in an exploratory state, having been produced to support
+another package and see if use can be got out of generalising
+conversion. As such. it is still an early release and the API may
+change. Comment is invited.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="installation"&gt;
+&lt;h2&gt;Installation&lt;/h2&gt;
+&lt;p&gt;This package can be installed by the usual Pythonic methods:&lt;/p&gt;
+&lt;ol class="arabic"&gt;
+&lt;li&gt;&lt;p class="first"&gt;use your favourite installation tool:&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+% easy_install rst2beamer
+&lt;/pre&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p class="first"&gt;or download the source, unpack it, change into the directory and call:&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+% python setup.py install
+&lt;/pre&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+&lt;div class="section" id="using-konval"&gt;
+&lt;h2&gt;Using konval&lt;/h2&gt;
+&lt;p&gt;A full API is included in the source distribution.&lt;/p&gt;
+&lt;p&gt;Most commonly, konval will be used to check or clean values. Failures
+result in exceptions being thrown:&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+# convert user input to a actual integer
+&amp;gt;&amp;gt;&amp;gt; from konval import *
+&amp;gt;&amp;gt;&amp;gt; sanitize ('1.0', ToInt())
+1
+&amp;gt;&amp;gt;&amp;gt; sanitize ('one', ToInt())
+Traceback (most recent call last)
+...
+ValueError: can't convert '1.0' to integer
+&lt;/pre&gt;
+&lt;p&gt;A single validator or list can be passed to sanitize. Failure in any
+will result in any exception:&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+# check a list has no more than 3 members
+&amp;gt;&amp;gt;&amp;gt; sanitize (['a', 'b', 'c'], [ToLength(), IsEqualOrLess(3)])
+3
+# check a password is long enough
+&amp;gt;&amp;gt;&amp;gt; sanitize ('mypass', [ToLength(),IsEqualOrMore(8)])
+Traceback (most recent call last)
+...
+ValueError: 6 is lower than 8
+&lt;/pre&gt;
+&lt;p&gt;Any callable object that accepts and returns a single value can be used
+as a validator:&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+&amp;gt;&amp;gt;&amp;gt; from string import *
+&amp;gt;&amp;gt;&amp;gt; sanitize (&amp;quot; my title &amp;quot;, [strip, capitalize])
+'My title'
+&lt;/pre&gt;
+&lt;p&gt;A rich library of prebuilt validators is supplied:&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+&amp;gt;&amp;gt;&amp;gt; sanitize ('abcde', IsNonblank()) 'abcde'
+&amp;gt;&amp;gt;&amp;gt; sanitize (5, IsInRange(1,6)) 5
+&amp;gt;&amp;gt;&amp;gt; sanitize ('foo', Synonyms({'foo': 'bar', 'baz': 'quux'}))
+'bar'
+&lt;/pre&gt;
+&lt;p&gt;Custom validators can easily be subclassed from a supplied base class:&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+class IsFoo (BaseValidator):
+        def validate_value (self, value):
+                if value != 'foo':
+                        self.raise_validation_error (value)
+                return True
+&lt;/pre&gt;
+&lt;div class="section" id="limitations"&gt;
+&lt;h3&gt;Limitations&lt;/h3&gt;
+&lt;p&gt;&lt;em&gt;konval&lt;/em&gt; is aimed at a one-way transformation of data, turning user
+input or stored data &lt;em&gt;into&lt;/em&gt; Python objects. Certainly it could be used
+in the reverse direction, but this is not a primary use case. FormEncode
+is based around two-way (round trip) conversion of data, so that may be
+a useful alternative.&lt;/p&gt;
+&lt;p&gt;The name &lt;em&gt;konval&lt;/em&gt; was chosen because:&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;there's already a Python library called &amp;quot;sanity&amp;quot;&lt;/li&gt;
+&lt;li&gt;out of &amp;quot;valcon&amp;quot;, &amp;quot;valkon&amp;quot;, &amp;quot;conval&amp;quot; etc. it was the one with the
+fewest hits on Google&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="references"&gt;
+&lt;h2&gt;References&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference external" href="http://formencode.org"&gt;FormEncode&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+</content><category term="python"></category><category term="software"></category><category term="package"></category></entry><entry><title>Py-qanda</title><link href="http://www.agapow.net/software/py-qanda/" rel="alternate"></link><published>2011-09-14T12:56:00+01:00</published><updated>2011-09-14T12:56:00+01:00</updated><author><name>Paul Agapow</name></author><id>tag:www.agapow.net,2011-09-14:/software/py-qanda/</id><summary type="html">&lt;div class="section" id="background"&gt;
+&lt;h2&gt;Background&lt;/h2&gt;
+&lt;p&gt;Interactive command-line programs need to query users for information,
+be it&amp;nbsp;text, choices from a list, or simple yes-or-no answers.
+&lt;em&gt;qanda&lt;/em&gt;&amp;nbsp;is a module of simple functions to prompt
+users for such information,&amp;nbsp;allowing validation and cleanup of answers,
+default responses, consistent&amp;nbsp;formatting and presentation of help text,
+hints …&lt;/p&gt;&lt;/div&gt;</summary><content type="html">&lt;div class="section" id="background"&gt;
+&lt;h2&gt;Background&lt;/h2&gt;
+&lt;p&gt;Interactive command-line programs need to query users for information,
+be it&amp;nbsp;text, choices from a list, or simple yes-or-no answers.
+&lt;em&gt;qanda&lt;/em&gt;&amp;nbsp;is a module of simple functions to prompt
+users for such information,&amp;nbsp;allowing validation and cleanup of answers,
+default responses, consistent&amp;nbsp;formatting and presentation of help text,
+hints and choices. It is not a&amp;nbsp;replacement for textual interfaces like
+curses and urwid, but intended solely&amp;nbsp;for simple console scripts with
+user input is required.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Status:&lt;/strong&gt; &lt;em&gt;qanda&lt;/em&gt;&amp;nbsp;is in use by one other
+non-trivial library, and so is&amp;nbsp;functional. However this is still an
+early release and the API may change.&amp;nbsp;Comment is invited.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="installation"&gt;
+&lt;h2&gt;Installation&lt;/h2&gt;
+&lt;p&gt;This package can be installed by the usual Pythonic methods:&lt;/p&gt;
+&lt;ol class="arabic"&gt;
+&lt;li&gt;&lt;p class="first"&gt;use your favourite installation tool:&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+% easy_install rst2beamer
+&lt;/pre&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p class="first"&gt;or download the source, unpack it, change into the directory and call:&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+% python setup.py install
+&lt;/pre&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+&lt;div class="section" id="usage"&gt;
+&lt;h2&gt;Usage&lt;/h2&gt;
+&lt;p&gt;A full API is included in the source distribution.&lt;/p&gt;
+&lt;p&gt;A few examples:&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+&amp;gt;&amp;gt;&amp;gt; from qanda import prompt
+&amp;gt;&amp;gt;&amp;gt; prompt.string (&amp;quot;What is your name&amp;quot;)
+What is your name: Foo
+&amp;gt;&amp;gt;&amp;gt; fname = prompt.string (&amp;quot;Your friends name is&amp;quot;,
+    help=&amp;quot;I need to know your friends name as well before I talk to you.&amp;quot;,
+    hints=&amp;quot;first name&amp;quot;,
+    default='Bar',
+)
+I need to know your friends name as well before I talk to you.
+Your friends name is (first name) [Bar]:
+&amp;gt;&amp;gt;&amp;gt; print fname
+Bar
+&amp;gt;&amp;gt;&amp;gt; years = prompt.integer (&amp;quot;And what is your age&amp;quot;, min=1, max=100)
+And what is your age: 101
+A problem: 101 is higher than 100. Try again ...
+And what is your age: 28
+&lt;/pre&gt;
+&lt;p&gt;&lt;em&gt;qanda&lt;/em&gt;&amp;nbsp;packages all question-asking methods in a &lt;tt class="docutils literal"&gt;Session&lt;/tt&gt; class. This
+allows&amp;nbsp;the appearance and functioning of all these methods to be handled
+consistently and modified centrally. However, you don't necessarily have
+to create a Session&amp;nbsp;to use it - there's pre-existing Session in the
+variable called &lt;tt class="docutils literal"&gt;prompt&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+&amp;gt;&amp;gt;&amp;gt; from qanda import Session
+&amp;gt;&amp;gt;&amp;gt; s = Session()
+&amp;gt;&amp;gt;&amp;gt; from qanda import prompt
+&amp;gt;&amp;gt;&amp;gt; type (prompt) &amp;lt;class 'qanda.session.Session'&amp;gt;
+&lt;/pre&gt;
+&lt;p&gt;The question methods are named after the type
+of data they elicit:&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+&amp;gt;&amp;gt;&amp;gt; print type(prompt.integer (&amp;quot;Pick a number&amp;quot;))
+Pick a number: 2
+&amp;lt;type 'int'&amp;gt;
+&amp;gt;&amp;gt;&amp;gt; print type (prompt.string (&amp;quot;Pick a name&amp;quot;))
+Pick a name: Bob
+&amp;lt;type 'string'&amp;gt;
+&lt;/pre&gt;
+&lt;p&gt;Many of the question methods
+with accept a list of &amp;quot;converters&amp;quot;, each of which&amp;nbsp;is used to
+successively transform or validate user input. This follows the idiom&amp;nbsp;of
+Ian Bicking's FormEncode: raw values are passed into &amp;nbsp;a converter and
+the&amp;nbsp;results are passed into the next. If input fails validation, the
+question is&amp;nbsp;posed again. &lt;em&gt;qanda&lt;/em&gt; supplies a number of basic
+validators:&lt;/p&gt;
+&lt;dl class="docutils"&gt;
+&lt;dt&gt;ToInt, ToFloat&lt;/dt&gt;
+&lt;dd&gt;Convert inputs to other types&lt;/dd&gt;
+&lt;dt&gt;Regex&lt;/dt&gt;
+&lt;dd&gt;Only allow values that match a certain pattern&lt;/dd&gt;
+&lt;dt&gt;Range&lt;/dt&gt;
+&lt;dd&gt;Check that input falls within given bounds&lt;/dd&gt;
+&lt;dt&gt;Length&lt;/dt&gt;
+&lt;dd&gt;Check that input length falls within given bounds&lt;/dd&gt;
+&lt;dt&gt;Synonyms&lt;/dt&gt;
+&lt;dd&gt;Map values to other values&lt;/dd&gt;
+&lt;dt&gt;Vocab&lt;/dt&gt;
+&lt;dd&gt;Ensure values fall within a fixed set&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;/div&gt;
+</content><category term="python"></category><category term="software"></category><category term="package"></category><category term="commandline"></category></entry><entry><title>psicons.core</title><link href="http://www.agapow.net/software/psicons-core/" rel="alternate"></link><published>2010-03-01T12:00:00+00:00</published><updated>2010-03-01T12:00:00+00:00</updated><author><name>Paul Agapow</name></author><id>tag:www.agapow.net,2010-03-01:/software/psicons-core/</id><summary type="html">&lt;div class="admonition note"&gt;
+&lt;p class="first admonition-title"&gt;Note&lt;/p&gt;
+&lt;p class="last"&gt;Although I used psicons heavily for a while, better and more humane tools have come along. In particular, I'd recommend snakemake. This page is left here for historical interest&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="background"&gt;
+&lt;h2&gt;Background&lt;/h2&gt;
+&lt;p&gt;Scientific analysis can be problematic:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;It may involve multiple steps, each using the results of the
+previous stage.&amp;nbsp;&amp;nbsp;Making …&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;</summary><content type="html">&lt;div class="admonition note"&gt;
+&lt;p class="first admonition-title"&gt;Note&lt;/p&gt;
+&lt;p class="last"&gt;Although I used psicons heavily for a while, better and more humane tools have come along. In particular, I'd recommend snakemake. This page is left here for historical interest&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="background"&gt;
+&lt;h2&gt;Background&lt;/h2&gt;
+&lt;p&gt;Scientific analysis can be problematic:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;It may involve multiple steps, each using the results of the
+previous stage.&amp;nbsp;&amp;nbsp;Making a mistake often means repeating the whole
+series for safety.&lt;/li&gt;
+&lt;li&gt;Sometimes analysis chains have to be repeated on different datasets.&lt;/li&gt;
+&lt;li&gt;Sometimes, even within a single analysis, the same manipulation or
+test has&amp;nbsp;to be repeated with slightly different parameters.&lt;/li&gt;
+&lt;li&gt;Even immediately after the fact, it's easy to forget what was done.
+9 months&amp;nbsp;later when responding to a referee's report, it may be
+impossible.&lt;/li&gt;
+&lt;li&gt;Collaborators, clients or bosses may demand accountability.&lt;/li&gt;
+&lt;li&gt;With long but routine tasks, it's easy to get bored and make
+mistakes.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;It this light, psicons is a quick and dirty hack to subvert the &lt;em&gt;scons&lt;/em&gt;
+build&amp;nbsp;system for scientific analysis. Every stage of analysis is a
+command-line call&amp;nbsp;to a script or executable that takes &lt;em&gt;inputs&lt;/em&gt; and
+produces &lt;em&gt;outputs&lt;/em&gt;. When&amp;nbsp;scons is called, dependencies between outputs
+and inputs are tested and only&amp;nbsp;those stages are run that are necessary
+to update outputs. In addition, the&amp;nbsp;exact sequence of analyses is
+recorded by the build file.&lt;/p&gt;
+&lt;p&gt;In summary, psicons provides:&lt;/p&gt;
+&lt;dl class="docutils"&gt;
+&lt;dt&gt;Repeatability:&lt;/dt&gt;
+&lt;dd&gt;running a build file, reruns the same analysis&lt;/dd&gt;
+&lt;dt&gt;Reproducibility:&lt;/dt&gt;
+&lt;dd&gt;the build file (and custom scripts) document the steps of&amp;nbsp;&amp;nbsp;the analysis&lt;/dd&gt;
+&lt;dt&gt;Minimization of effort:&lt;/dt&gt;
+&lt;dd&gt;if inputs or analysis steps are changed, only the&amp;nbsp; necessary (dependent) steps of the analysis are rerun&lt;/dd&gt;
+&lt;dt&gt;Mistake-resistant:&lt;/dt&gt;
+&lt;dd&gt;errors don't derail analysis due to
+reproducibility (&amp;quot;what&amp;nbsp; did I do&amp;quot;) and minimization of effort (only
+dependent steps are repeated)&lt;/dd&gt;
+&lt;dt&gt;Programmability:&lt;/dt&gt;
+&lt;dd&gt;analysis tasks may be constructed with
+programatically&amp;nbsp; (&amp;quot;repeat the analysis across this parameter range&amp;quot;)&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;p&gt;psicons is very much a hack-and-see project, having been produced in
+the&amp;nbsp;aftermath of the 2009 H1N1 pandemic from the need for complex
+processing of&amp;nbsp;large amounts of sequence data using ad-hoc scripts and
+formats. It worked&amp;nbsp;well in that limited role, but is still an early
+release exploring the&amp;nbsp;approach. Functionality is limited and the API may
+change. Comment is invited.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="installation"&gt;
+&lt;h2&gt;Installation&lt;/h2&gt;
+&lt;p&gt;This package can be installed by the usual Pythonic methods:&lt;/p&gt;
+&lt;ol class="arabic"&gt;
+&lt;li&gt;&lt;p class="first"&gt;use your favourite installation tool:&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+% easy_install rst2beamer
+&lt;/pre&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p class="first"&gt;or download the source, unpack it, change into the directory and call:&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+% python setup.py install
+&lt;/pre&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;em&gt;psicons&lt;/em&gt; requires that scons is installed, which is where things get
+tricky.&amp;nbsp;Scons by default installs itself in a sandboxed way with
+multiple versions&amp;nbsp;living side-by-side and thus being non-importable. Of
+course, &lt;em&gt;psicons&lt;/em&gt; needs&amp;nbsp;to use the scons library, so a conventional
+installation must be forced. &amp;nbsp;Download the scons tarball, unpack it and
+install it like thus:&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+% python setup.py install --standard-lib
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="usage"&gt;
+&lt;h2&gt;Usage&lt;/h2&gt;
+&lt;p&gt;A full API is included in the source distribution.&lt;/p&gt;
+&lt;p&gt;Psicons works just like scons. In fact, it is scons. More details are
+available&amp;nbsp;elsewhere but briefly, you run scons like this:&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+# look for a build file called &amp;quot;Sconstruct&amp;quot; by default
+% scons
+# looks for a named build file
+% scons -f mybuildfile
+&lt;/pre&gt;
+&lt;p&gt;This causes scons to execute the build file, which is just a Python
+script,&amp;nbsp;defining a series of tasks or &lt;em&gt;commands&lt;/em&gt;:&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+# an scons build file
+# some necessary administration - set up the build environment
+env = Environment()
+# compile two libraries and then combine into one program
+first_libs = env.Object ('hello.c', CCFLAGS='-DHELLO')
+second_libs = env.Object ('goodbye.c', CCFLAGS='-DGOODBYE')
+env.Program (first_libs + second_libs)
+&lt;/pre&gt;
+&lt;p&gt;The first time this file is executed, the first two commands build
+libraries,&amp;nbsp;while the third combines the libraries into a single
+executable. Dependencies&amp;nbsp;between the steps are automatically tracked:
+should one of the original source&amp;nbsp;files be changed (e.g. hello.c), when
+the file is rerun only the steps&amp;nbsp;&amp;quot;downstream&amp;quot; of it (e.g. recompilation
+of the first library, and the final&amp;nbsp;linking) are rerun.&lt;/p&gt;
+&lt;p&gt;Scons has a large number of commands for all sorts of software builds.
+Psicons&amp;nbsp;adds two new commands, so that local scripts or external
+programs can be used&amp;nbsp;to in a build. In this way, complex multi-step
+analyses can be constructed from&amp;nbsp;a series of interdependent commands,
+that &amp;quot;build&amp;quot; intermediate data and final&amp;nbsp;results:&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+from psicons.core import *
+
+env = Environment()
+
+# call a local script
+IN_DATA = 'jg_08-10_2010.csv'
+CLEAN_DATA = 'jg_08-10_2010-cleaned.csv'
+make_clean_data = Script (env, 'clean_seqs.py',
+    args = ['--save-as', CLEAN_DATA],
+    infiles = [IN_DATA],
+    output = CLEAN_DATA,
+)
+
+# call an external command
+EPI_DATA = 'jg-types.txt'
+RESULT_DATA = 'results.tab'
+type_data = External (env, 'treemaker',
+    args = ['--save-as', RESULT_DATA],
+    infiles = [CLEAN_DATA, EPI_DATA],
+    output = [RESULT_DATA],
+)
+&lt;/pre&gt;
+&lt;p&gt;The interfaces of these two commands are similar:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;what is being called?&lt;/li&gt;
+&lt;li&gt;what inputs does it use (depend on)?&lt;/li&gt;
+&lt;li&gt;what outputs does it produce?&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;When scons is run on this build file, it calls the script
+&lt;tt class="docutils literal"&gt;clean_seqs.py&lt;/tt&gt; on&amp;nbsp;&lt;tt class="docutils literal"&gt;IN_DATA&lt;/tt&gt; to produce &lt;tt class="docutils literal"&gt;CLEAN_DATA&lt;/tt&gt;. Then the
+external program &lt;tt class="docutils literal"&gt;treemaker&lt;/tt&gt; is&amp;nbsp;called on &lt;tt class="docutils literal"&gt;CLEAN_DATA&lt;/tt&gt; and
+&lt;tt class="docutils literal"&gt;EPI_DATA&lt;/tt&gt; to produce &lt;tt class="docutils literal"&gt;RESULT_DATA&lt;/tt&gt;. Should&amp;nbsp;&lt;tt class="docutils literal"&gt;EPI_DATA&lt;/tt&gt; be
+edited, when scons is called again, only the second external&amp;nbsp;step will
+be run again as the first step and it's results is still up to date.&lt;/p&gt;
+&lt;p&gt;Thus:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Analyses may be run (and rerun) easily&lt;/li&gt;
+&lt;li&gt;If data changes (or scripts change - bug fixes), only the necessary
+steps are&amp;nbsp; rerun&lt;/li&gt;
+&lt;li&gt;The actions taken are recorded in the build file&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;To ease renaming intermediate or output files in a rational way,
+&lt;em&gt;psicons&lt;/em&gt;&amp;nbsp;offers a few utility functions for interpolating file names
+from parameters. To&amp;nbsp;illustrate:&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+# generate a new string from a template
+&amp;gt;&amp;gt;&amp;gt; d = {'foo': '123', 'bar': '456'}
+&amp;gt;&amp;gt;&amp;gt; interpolate ('ab{foo}cd{bar}ef', d)
+'ab123cd456ef'
+# name new file name from old by adding suffix to name
+&amp;gt;&amp;gt;&amp;gt; interpolate_from_path ('mydata.csv', '{stem}-cleaned{ext}')
+'mydata-cleaned.csv'
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="limitations"&gt;
+&lt;h2&gt;Limitations&lt;/h2&gt;
+&lt;p&gt;Certainly, far, far more complicated reproducibility tools are out there
+(see &lt;a class="reference external" href="http://csdl2.computer.org/comp/mags/cs/2009/01/mcs2009010005.pdf"&gt;here&lt;/a&gt;)
+but&amp;nbsp;many are based around certain disciplines (e.g. geophysics,
+computational math),&amp;nbsp;require working through web interfaces or using
+very standard sets of analysis&amp;nbsp;tools. &lt;em&gt;psicons&lt;/em&gt; is written from the
+point of view of a bioinformatician doing&amp;nbsp;sequence and phylogenetic
+analysis, working on the commandline using a lot of&amp;nbsp;custom scripts and
+an endlessly changing lineup of supplied tools. As sometimes&amp;nbsp;happens,
+other tools didn't fit, so I wrote one that did.&lt;/p&gt;
+&lt;p&gt;As with many quick hack tools, documentation is currently a bit thin.&lt;/p&gt;
+&lt;p&gt;The need for a modified scons installation is a blemish. Future versions
+of&amp;nbsp;psicons may need to directly incorporate scons for ease of
+installation.&lt;/p&gt;
+&lt;p&gt;Clearly, a set of standard tools for extracting, transforming and
+plotting&amp;nbsp;data would be a powerful addition to &lt;em&gt;psicons&lt;/em&gt;. This doesn't
+exist as yet.&lt;/p&gt;
+&lt;p&gt;The process of installing a new tool or module for use by SCons is
+fiddly, involves copying libraries in a tool directory,
+registering &amp;nbsp;their use in build files, voids the ease of using
+&lt;tt class="docutils literal"&gt;easy_install&lt;/tt&gt; and makes&amp;nbsp;development a pain. Thus, the additional
+&amp;quot;commands&amp;quot; are real scons commands, so much as functions that generate
+commands. But they are easy to use.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="credit"&gt;
+&lt;h2&gt;Credit&lt;/h2&gt;
+&lt;p&gt;Thanks to the architects of Scons, of course.&lt;/p&gt;
+&lt;p&gt;While this project was started before encountering Madagascar, it&amp;nbsp;has inevitably shaped development. It's a remarkably
+powerful system, although&amp;nbsp;ill-suited to my current purposes. You should
+check it out.&lt;/p&gt;
+&lt;p&gt;Only when writing this document did I become aware of &lt;em&gt;sconstools&lt;/em&gt;, which seems to be following exactly the same direction as psicons.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="references"&gt;
+&lt;h2&gt;References&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference external" href="http://www.scons.org"&gt;Scons&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="http://reproducibility.org/wiki/Reproducible_computational_experiments_using_SCons"&gt;Madagscar and Scons for reproducibility&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="http://scons.org/doc/production/HTML/scons-user/x3697.html"&gt;Where To Put Your Custom Builders and Tools&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="http://code.google.com/p/sconstools/"&gt;Sconstools&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+</content><category term="reproducibility"></category><category term="python"></category><category term="software"></category></entry><entry><title>osgb</title><link href="http://www.agapow.net/software/osgb/" rel="alternate"></link><published>2009-10-01T12:00:00+01:00</published><updated>2009-10-01T12:00:00+01:00</updated><author><name>Paul Agapow</name></author><id>tag:www.agapow.net,2009-10-01:/software/osgb/</id><summary type="html">&lt;div class="section" id="background"&gt;
+&lt;h2&gt;Background&lt;/h2&gt;
+&lt;p&gt;Many geospatial locations within the UK are given with the Ordnance
+Survey system. While common and highly accurate, this coordinate system
+is peculiar to the UK and incompatible with many modern cartography
+tools. This module presents functions for converting between these and
+the most widely spread longitude-latitude system.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="installation"&gt;
+&lt;h2&gt;Installation …&lt;/h2&gt;&lt;/div&gt;</summary><content type="html">&lt;div class="section" id="background"&gt;
+&lt;h2&gt;Background&lt;/h2&gt;
+&lt;p&gt;Many geospatial locations within the UK are given with the Ordnance
+Survey system. While common and highly accurate, this coordinate system
+is peculiar to the UK and incompatible with many modern cartography
+tools. This module presents functions for converting between these and
+the most widely spread longitude-latitude system.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="installation"&gt;
+&lt;h2&gt;Installation&lt;/h2&gt;
+&lt;p&gt;This package can be installed by the usual Pythonic methods:&lt;/p&gt;
+&lt;ol class="arabic"&gt;
+&lt;li&gt;&lt;p class="first"&gt;use your favourite installation tool:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;% easy_install osgb&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p class="first"&gt;or download the source, unpack it, change into the directory and call:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;% python setup.py install&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+&lt;div class="section" id="usage"&gt;
+&lt;h2&gt;Usage&lt;/h2&gt;
+&lt;p&gt;osgb provides two primary functions, &lt;tt class="docutils literal"&gt;osgb_to_lonlat&lt;/tt&gt; and
+&lt;tt class="docutils literal"&gt;lonlat_to_osgb&lt;/tt&gt;, which are imported into the top of this package. Some
+of the intermediate conversions are provided for those who may find them
+useful (e.g. for working in eastings-northings).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="limitations"&gt;
+&lt;h2&gt;Limitations&lt;/h2&gt;
+&lt;p&gt;By convention, longitude and latitude are referred and used in that
+order.&lt;/p&gt;
+&lt;p&gt;Note that the lon-lats are returned are OSGB36 (not the more modern
+WGS84), as that is the system OSGB is based upon. The difference should
+be minimal (i.e. less than 100 metres). For example, the OS grid
+reference TM114 525 (just outside Ipswich) should convert to the lon-lat
+1.088975 52.129892 in OSGB36, which is 1.087203 52.130350 in WGS84.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="references"&gt;
+&lt;h2&gt;References&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;The Ordnance Survey provides &lt;a class="reference external" href="http://www.ordnancesurvey.co.uk/oswebsite/gps/information/coordinatesystemsinfo/guidecontents/index.html"&gt;a guide to coordinate systems&lt;/a&gt;, the &lt;a class="reference external" href="http://www.ordnancesurvey.co.uk/oswebsite/gps/information/coordinatesystemsinfo/guidecontents/guidec.html"&gt;equations for conversion&lt;/a&gt; and the &lt;a class="reference external" href="http://www.ordnancesurvey.co.uk/oswebsite/gps/information/coordinatesystemsinfo/guidecontents/guidea.html"&gt;required constants&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;A nice explanation of the OSGB system can be found &lt;a class="reference external" href="http://vancouver-webpages.com/peter/osgbfaq.txt"&gt;here&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;J Stott provides a &lt;a class="reference external" href="http://www.jstott.me.uk"&gt;PHP library&lt;/a&gt; as well as Javascript and Java implementations. Chris Veness' &lt;a class="reference external" href="http://www.movable-type.co.uk/scripts/latlong-gridref.html"&gt;Javascript implementation&lt;/a&gt; was a useful reference in the conversion, as was A. Rutherfords &lt;a class="reference external" href="http://ccgi.arutherford.plus.com/website/GeoPosition"&gt;Geoposition&lt;/a&gt;. The &lt;a class="reference external" href="http://search.cpan.org/~toby/Geo-Coordinates-OSGB-2.01/lib/Geo/Coordinates/OSGB.pm"&gt;Perl module Geo::Coordinates::OSGB&lt;/a&gt; provides similar services.&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="http://nearby.org.uk"&gt;Nearby.org.uk&lt;/a&gt; provides conversion between many geospatial formats including OS.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+</content><category term="software"></category><category term="python"></category><category term="geospatial"></category></entry><entry><title>biblio.webquery</title><link href="http://www.agapow.net/software/biblio-webquery/" rel="alternate"></link><published>2008-06-01T12:00:00+01:00</published><updated>2008-06-01T12:00:00+01:00</updated><author><name>Paul Agapow</name></author><id>tag:www.agapow.net,2008-06-01:/software/biblio-webquery/</id><summary type="html">&lt;div class="section" id="background"&gt;
+&lt;h2&gt;Background&lt;/h2&gt;
+&lt;p&gt;This package presents a number of methods for querying webservices for
+bibliographic information, and includes two scripts for querying and
+renaming files by ISBN.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="installation"&gt;
+&lt;h2&gt;Installation&lt;/h2&gt;
+&lt;p&gt;This package can be installed by the usual Pythonic methods:&lt;/p&gt;
+&lt;ol class="arabic"&gt;
+&lt;li&gt;&lt;p class="first"&gt;use your favourite installation tool:&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+% easy_install biblio.webquery
+&lt;/pre&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p class="first"&gt;or download the source, unpack it …&lt;/p&gt;&lt;/li&gt;&lt;/ol&gt;&lt;/div&gt;</summary><content type="html">&lt;div class="section" id="background"&gt;
+&lt;h2&gt;Background&lt;/h2&gt;
+&lt;p&gt;This package presents a number of methods for querying webservices for
+bibliographic information, and includes two scripts for querying and
+renaming files by ISBN.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="installation"&gt;
+&lt;h2&gt;Installation&lt;/h2&gt;
+&lt;p&gt;This package can be installed by the usual Pythonic methods:&lt;/p&gt;
+&lt;ol class="arabic"&gt;
+&lt;li&gt;&lt;p class="first"&gt;use your favourite installation tool:&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+% easy_install biblio.webquery
+&lt;/pre&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p class="first"&gt;or download the source, unpack it, change into the directory and call:&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+% python setup.py install
+&lt;/pre&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Depending on your platform, the scripts may be installed as &lt;tt class="docutils literal"&gt;.py&lt;/tt&gt; scripts, or some form of executable, or both.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="usage"&gt;
+&lt;h2&gt;Usage&lt;/h2&gt;
+&lt;p&gt;This was initially written for my own purposes (querying webservices for book information so I could correct the metadata on my ebooks and name them appropriately), so the features may be a little eccentric and documentation is thin. However, the code is not complex and can be easily understood.&lt;/p&gt;
+&lt;p&gt;Two scripts are installed with this package: &lt;tt class="docutils literal"&gt;queryisbn&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;renamebyisbn&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;queryisbn&lt;/tt&gt; returns bibliographic information from webservices for supplied ISBNs. It is called:&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+% queryisbn.py [options] ISBNs ...
+&lt;/pre&gt;
+&lt;p&gt;with the options:&lt;/p&gt;
+&lt;table class="docutils option-list" frame="void" rules="none"&gt;
+&lt;col class="option" /&gt;
+&lt;col class="description" /&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td class="option-group"&gt;
+&lt;kbd&gt;&lt;span class="option"&gt;--version&lt;/span&gt;&lt;/kbd&gt;&lt;/td&gt;
+&lt;td&gt;show program's version number and exit&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td class="option-group"&gt;
+&lt;kbd&gt;&lt;span class="option"&gt;-h&lt;/span&gt;, &lt;span class="option"&gt;--help&lt;/span&gt;&lt;/kbd&gt;&lt;/td&gt;
+&lt;td&gt;show this help message and exit&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td class="option-group"&gt;
+&lt;kbd&gt;&lt;span class="option"&gt;--debug&lt;/span&gt;&lt;/kbd&gt;&lt;/td&gt;
+&lt;td&gt;For errors, issue a full traceback instead of just a message.&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td class="option-group" colspan="2"&gt;
+&lt;kbd&gt;&lt;span class="option"&gt;-s &lt;var&gt;SERVICE&lt;/var&gt;&lt;/span&gt;, &lt;span class="option"&gt;--service=&lt;var&gt;SERVICE&lt;/var&gt;&lt;/span&gt;&lt;/kbd&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&amp;nbsp;&lt;/td&gt;&lt;td&gt;The webservice to query. Choices are xisbn (WorldCat xISBN), isbndb (ISBNdb). The default is xisbn.&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td class="option-group" colspan="2"&gt;
+&lt;kbd&gt;&lt;span class="option"&gt;-k &lt;var&gt;KEY&lt;/var&gt;&lt;/span&gt;, &lt;span class="option"&gt;--key=&lt;var&gt;KEY&lt;/var&gt;&lt;/span&gt;&lt;/kbd&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&amp;nbsp;&lt;/td&gt;&lt;td&gt;The access key for the webservice, if one is required.&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;For example:&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+% queryisbn.py 1568385048 1564145026
+1568385048
+title: Drop the rock: removing character defects
+authors: [Bill Pittman, Todd Weber]
+publisher: Hazelden
+year: 1999
+lang: eng
+1564145026:
+title: Stop clutter from stealing your life : discover why you clutter and how you can stop
+authors: [Mike Nelson]
+publisher: New Page Books
+year: 2001
+lang: eng
+
+% queryisbn.py --debug -s isbndb -k OPNH8HG2 1568385048 1564145026
+1568385048:
+title: Drop the Rock: Removing Character Defects
+authors: [Bill Pittman, Todd Weber]
+1564145026:
+authors: [Mike Nelson]
+&lt;/pre&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;renamebyisbn&lt;/tt&gt; extracts an ISBN from a file name, looks up the associated bibliographic information in a webservice and renames the file appropriately. It is called:&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+% renamebyisbn.py [options] FILES ...
+&lt;/pre&gt;
+&lt;p&gt;with the options:&lt;/p&gt;
+&lt;table class="docutils option-list" frame="void" rules="none"&gt;
+&lt;col class="option" /&gt;
+&lt;col class="description" /&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td class="option-group"&gt;
+&lt;kbd&gt;&lt;span class="option"&gt;--version&lt;/span&gt;&lt;/kbd&gt;&lt;/td&gt;
+&lt;td&gt;show program's version number and exit&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td class="option-group"&gt;
+&lt;kbd&gt;&lt;span class="option"&gt;-h&lt;/span&gt;, &lt;span class="option"&gt;--help&lt;/span&gt;&lt;/kbd&gt;&lt;/td&gt;
+&lt;td&gt;show this help message and exit&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td class="option-group"&gt;
+&lt;kbd&gt;&lt;span class="option"&gt;--debug&lt;/span&gt;&lt;/kbd&gt;&lt;/td&gt;
+&lt;td&gt;For errors, issue a full traceback instead of just a message.&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td class="option-group" colspan="2"&gt;
+&lt;kbd&gt;&lt;span class="option"&gt;-s &lt;var&gt;SERVICE&lt;/var&gt;&lt;/span&gt;, &lt;span class="option"&gt;--service=&lt;var&gt;SERVICE&lt;/var&gt;&lt;/span&gt;&lt;/kbd&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&amp;nbsp;&lt;/td&gt;&lt;td&gt;The webservice to query. Choices are xisbn (WorldCat xISBN), isbndb (ISBNdb). The default is xisbn.&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td class="option-group" colspan="2"&gt;
+&lt;kbd&gt;&lt;span class="option"&gt;-k &lt;var&gt;KEY&lt;/var&gt;&lt;/span&gt;, &lt;span class="option"&gt;--key=&lt;var&gt;KEY&lt;/var&gt;&lt;/span&gt;&lt;/kbd&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&amp;nbsp;&lt;/td&gt;&lt;td&gt;The access key for the webservice, if one is required.&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td class="option-group" colspan="2"&gt;
+&lt;kbd&gt;&lt;span class="option"&gt;-c &lt;var&gt;CASE&lt;/var&gt;&lt;/span&gt;, &lt;span class="option"&gt;--case=&lt;var&gt;CASE&lt;/var&gt;&lt;/span&gt;&lt;/kbd&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&amp;nbsp;&lt;/td&gt;&lt;td&gt;Case conversion of the new file name. Choices are orig, upper, lower.The default is orig.&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td class="option-group" colspan="2"&gt;
+&lt;kbd&gt;&lt;span class="option"&gt;--leave_whitespace&lt;/span&gt;&lt;/kbd&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&amp;nbsp;&lt;/td&gt;&lt;td&gt;Leave excess whitespace. By default, consecutive spaces in names are compacted&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td class="option-group" colspan="2"&gt;
+&lt;kbd&gt;&lt;span class="option"&gt;--replace_whitespace=&lt;var&gt;REPLACE_WHITESPACE&lt;/var&gt;&lt;/span&gt;&lt;/kbd&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&amp;nbsp;&lt;/td&gt;&lt;td&gt;Replace whitespace in the new name with this string.&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td class="option-group" colspan="2"&gt;
+&lt;kbd&gt;&lt;span class="option"&gt;--strip_chars=&lt;var&gt;STRIP_CHARS&lt;/var&gt;&lt;/span&gt;&lt;/kbd&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&amp;nbsp;&lt;/td&gt;&lt;td&gt;Remove these characters from the new name. By default this are ':!,'&amp;quot;.?()'.&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td class="option-group"&gt;
+&lt;kbd&gt;&lt;span class="option"&gt;--overwrite&lt;/span&gt;&lt;/kbd&gt;&lt;/td&gt;
+&lt;td&gt;Overwrite existing files.&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td class="option-group"&gt;
+&lt;kbd&gt;&lt;span class="option"&gt;--dryrun&lt;/span&gt;&lt;/kbd&gt;&lt;/td&gt;
+&lt;td&gt;Check function and without renaming files.&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td class="option-group" colspan="2"&gt;
+&lt;kbd&gt;&lt;span class="option"&gt;--template=&lt;var&gt;TEMPLATE&lt;/var&gt;&lt;/span&gt;&lt;/kbd&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&amp;nbsp;&lt;/td&gt;&lt;td&gt;The form to use for renaming the file. The fields recognised are auth (primary authors family name), title (full title of the book), short_title (abbreviated title), isbn, year (year of publication). The default is '%(auth)s%(year)s_%(short_title)s_(isbn%(isbn)s)'.&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td class="option-group" colspan="2"&gt;
+&lt;kbd&gt;&lt;span class="option"&gt;--unknown=&lt;var&gt;UNKNOWN&lt;/var&gt;&lt;/span&gt;&lt;/kbd&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&amp;nbsp;&lt;/td&gt;&lt;td&gt;Use this string if value is undefined.&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;The new name is generated first before the various processing options
+are applied. In order, characters are stripped from the name, excess
+whitespace is collapsed and then the case conversion is applied. We
+suggest you try a dryrun before renaming any files. The file extension,
+if any, is removed before renaming and re-applied afterwards.&lt;/p&gt;
+&lt;p&gt;For example, working with 4 files called '0763718165.Jones Course.djvu',
+'helm_0671708821 (orig).pdf', 'tutor_9780198568322.rar',
+'unce.9783540237730.27380.pdf':&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+% renamebyisbn.py --dryrun books/*
+Original books/0763718165.JonesCourse.djvu ...
+extracted ISBN 0763718165 ...
+found Andersen - Data structures in Java : a laboratory course
+new name Andersen2001_Data structures in Java_isbn0763718165.
+new path books/Andersen2001_Data structures in Java_isbn0763718165.djvu. Original books/helm_0671708821 (orig).pdf ...
+extracted ISBN 0671708821 ...
+found Helmstetter - What to say when you talk about yourself.
+new name Helmstetter1990_What to say when you talk about yourself_isbn0671708821.
+new path books/Helmstetter1990_What to say when you talk about yourself_isbn0671708821.pdf.
+Original books/tutor_9780198568322.rar ...
+extracted ISBN 9780198568322 ...
+found Skilling - Data analysis : a Bayesian tutorial ; [for scientists and engineers]
+new name Skilling2006_Data analysis_isbn9780198568322.
+new path books/Skilling2006_Data analysis_isbn9780198568322.rar.
+Original books/unce.9783540237730.27380.pdf ...
+extracted ISBN 9783540237730 ...
+found McDaniel - Uncertainty and surprise in complex systems questions on working with the unexpected
+new name McDaniel2005_Uncertainty and surprise in complex systems questions on working with the unexpected_isbn9783540237730.
+new path books/McDaniel2005_Uncertainty and surprise in complex systems
+questions on working with the unexpected_isbn9783540237730.pdf.
+&lt;/pre&gt;
+&lt;p&gt;If you use the package directly in code, &lt;tt class="docutils literal"&gt;biblio.webquery&lt;/tt&gt; presents several classes that may be useful:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;BaseWebQuery&lt;/tt&gt;, a simple class for encapsulating queries to webservices&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;BaseKeyedWebQuery&lt;/tt&gt;, ditto except allowing for access keys&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;XisbnQuery&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;IsbndbQuery&lt;/tt&gt;, for fetching bibliographic information from Worldcat xISBN and ISBNdb services respectively&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;QueryThrottle&lt;/tt&gt;, for limiting the frequency or total number of service queries.&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;BibRecord&lt;/tt&gt;, a general class for holding bibliographic information&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;PersonalName&lt;/tt&gt;, a class for holding a name along functions for parsing names into this class.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Thanos Vassilakis has posted what looks like &lt;a class="reference external" href="http://pypi.python.org/pypi/book"&gt;a very useful module&lt;/a&gt; for querying by ISBN. However it seems to have disappeared from its home website.&lt;/p&gt;
+&lt;div class="section" id="limitations"&gt;
+&lt;h3&gt;Limitations&lt;/h3&gt;
+&lt;p&gt;Note that all bibliographic databases contain a certain amount of malformed entries or inconsistent formatting. For example, edition may or may not be included in the title, authors can be given as 'Firstname Lastname' / 'Lastname, Firstname' / 'F Lastname' / etc. etc. and so on. To this end, the package uses a number of heuristics to nomrlaise the data.&lt;/p&gt;
+&lt;p&gt;To use the ISBNdb, a key must be provided. This can be obtained for free by signing up on the website.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="references"&gt;
+&lt;h2&gt;References&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference external" href="http://isbndb.com"&gt;ISBNdb&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+</content><category term="ebooks"></category><category term="metadata"></category><category term="software"></category><category term="python"></category><category term="isbn"></category><category term="package"></category></entry><entry><title>ezplone</title><link href="http://www.agapow.net/software/ezplone/" rel="alternate"></link><published>2007-06-01T12:00:00+01:00</published><updated>2007-06-01T12:00:00+01:00</updated><author><name>Paul Agapow</name></author><id>tag:www.agapow.net,2007-06-01:/software/ezplone/</id><summary type="html">&lt;div class="section" id="background"&gt;
+&lt;h2&gt;Background&lt;/h2&gt;
+&lt;div class="admonition note"&gt;
+&lt;p class="first admonition-title"&gt;Note&lt;/p&gt;
+&lt;p class="last"&gt;This library was developed for personal use during the bad old days of Plone development around version 2.5. It almost certainly does not work with Plone 3+ and is kept here for historical interest.&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;This library originated from a desire to do away with the large amount …&lt;/p&gt;&lt;/div&gt;</summary><content type="html">&lt;div class="section" id="background"&gt;
+&lt;h2&gt;Background&lt;/h2&gt;
+&lt;div class="admonition note"&gt;
+&lt;p class="first admonition-title"&gt;Note&lt;/p&gt;
+&lt;p class="last"&gt;This library was developed for personal use during the bad old days of Plone development around version 2.5. It almost certainly does not work with Plone 3+ and is kept here for historical interest.&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;This library originated from a desire to do away with the large amount
+of&amp;nbsp;boilerplate code required to bootstrap a Plone product. It
+provides&amp;nbsp;installer, deinstaller and initaliser classes that provide
+reasonable default&amp;nbsp;behaviour. It uses the old (Plone 2.x) way of
+installing old-fashioned&amp;nbsp;Products but these are still surprisingly
+common in these days of egg-ified&amp;nbsp;Plone add-ons (and sometimes easier to
+write). It won't fit all purposes but does make for quick-and-dirty
+bootstrapping of a Product.&lt;/p&gt;
+&lt;p&gt;It also includes some other useful utility functions for Plone, mostly
+with&amp;nbsp;an eye towards manipulating Plone from the debug prompt.&lt;/p&gt;
+&lt;p&gt;There are numerous other Products or package that provide
+similar&amp;nbsp;functionality, including InstallUtils and PloneUtils.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="installation"&gt;
+&lt;h2&gt;Installation&lt;/h2&gt;
+&lt;p&gt;It's a Plone Product. Drop it in your Plone directory.&lt;/p&gt;
+&lt;p&gt;I suppose a buildout installation would probably work, but I won't guarantee it.&lt;/p&gt;
+&lt;/div&gt;
+</content><category term="plone"></category><category term="programming"></category><category term="web-development"></category></entry><entry><title>rst2beamer</title><link href="http://www.agapow.net/software/rst2beamer/" rel="alternate"></link><published>2006-10-01T12:00:00+01:00</published><updated>2006-10-01T12:00:00+01:00</updated><author><name>Paul Agapow</name></author><id>tag:www.agapow.net,2006-10-01:/software/rst2beamer/</id><summary type="html">&lt;div class="admonition note"&gt;
+&lt;p class="first admonition-title"&gt;Note&lt;/p&gt;
+&lt;p class="last"&gt;rst2beamer has been wildly successful and used far beyond what I imagined.
+Further development has been taken on by Ryan Krauss and subsequently others. The source has been moved to its own
+repo on github and that (and the PyPi page) should be used as the primary sources. No …&lt;/p&gt;&lt;/div&gt;</summary><content type="html">&lt;div class="admonition note"&gt;
+&lt;p class="first admonition-title"&gt;Note&lt;/p&gt;
+&lt;p class="last"&gt;rst2beamer has been wildly successful and used far beyond what I imagined.
+Further development has been taken on by Ryan Krauss and subsequently others. The source has been moved to its own
+repo on github and that (and the PyPi page) should be used as the primary sources. No more releases will be made vaialble via this site.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="background"&gt;
+&lt;h2&gt;Background&lt;/h2&gt;
+&lt;p&gt;Writing a series of presentations is a pain.&lt;/p&gt;
+&lt;p&gt;While preparing the slides for week 2 of a 6 week course, I realised the amount of time I was spending on
+minutiae - pasting code in, adjusting the formatting of said code, lining up boxes. It was all just bulletpoints and code and it was taking me ages to prepare the sldies for a single lecture.&lt;/p&gt;
+&lt;p&gt;So I instead spent ages writing a tool that converted restructured text to slides.&lt;/p&gt;
+&lt;p&gt;rst2beamer is basically a gloss on the docutils rst2latex tool, except that it converts ReST to Beamer, which is a LaTeX document class for slide presentations. This in turn may be converted to the usual LaTeX destinations: dvi, pdf, etc. rst2beamer have been used successfully across the globe in preparing presentations for lectures and conferences. It allows you to concentrate on &lt;em&gt;content&lt;/em&gt; and &lt;em&gt;structure&lt;/em&gt; and rely on the tool to generate a decent looking presentation.&lt;/p&gt;
+&lt;p&gt;You may wish to explore some of the alternatives that have subsequently cropped up: rst2slides or rst2s5.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="installation"&gt;
+&lt;h2&gt;Installation&lt;/h2&gt;
+&lt;p&gt;This package can be installed by the usual Pythonic methods:&lt;/p&gt;
+&lt;ol class="arabic"&gt;
+&lt;li&gt;&lt;p class="first"&gt;use your favourite installation tool:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;% easy_install rst2beamer&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p class="first"&gt;or download the source, unpack it, change into the directory and call:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;% python setup.py install&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+&lt;div class="section" id="usage"&gt;
+&lt;h2&gt;Usage&lt;/h2&gt;
+&lt;div class="admonition note"&gt;
+&lt;p class="first admonition-title"&gt;Note&lt;/p&gt;
+&lt;p class="last"&gt;Depending on your platform, the scripts may be installed as &lt;tt class="docutils literal"&gt;.py&lt;/tt&gt; scripts, or some form of executable, or both.&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;rst2beamer can be called:&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+rst2beamer.py infile.txt &amp;gt; outfile.tex
+&lt;/pre&gt;
+&lt;p&gt;where &lt;tt class="docutils literal"&gt;infile.txt&lt;/tt&gt; contains the source text and &lt;tt class="docutils literal"&gt;outfile.tex&lt;/tt&gt; contains the produced
+Beamer LaTeX. It can takes all the arguments that &lt;tt class="docutils literal"&gt;rst2latex&lt;/tt&gt; does, save
+the documentclass option (which is fixed to &lt;tt class="docutils literal"&gt;beamer&lt;/tt&gt;) and hyperref options
+(which are already set in beamer).&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;rst2beamer&lt;/em&gt; should interpret a reasonable subset of restructured text and
+produce reasonable LaTeX. Not all features of beamer have been
+implemented, just a (large) subset that allows the quick production of
+good looking slides.&lt;/p&gt;
+&lt;p&gt;These include:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Overlay lists (i.e. those that appear point-by-point)&lt;/li&gt;
+&lt;li&gt;Beamer themes&lt;/li&gt;
+&lt;li&gt;Automatic centering and resizing of figures&lt;/li&gt;
+&lt;li&gt;Embedded notes and the output of note slides.&lt;/li&gt;
+&lt;li&gt;Arranging slide contents into columns.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Consult the manual in the distribution for more detasils. Some examples can be found in the &lt;tt class="docutils literal"&gt;docs/examples&lt;/tt&gt; directory of the
+distribution. In practice, rst2beamer can be used &amp;nbsp;with &lt;tt class="docutils literal"&gt;pdflatex&lt;/tt&gt; to get
+PDF versions of a presentation.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="limitations"&gt;
+&lt;h2&gt;Limitations&lt;/h2&gt;
+&lt;p&gt;Earlier versions of rst2beamer did not work with docutils 0.4, seemingly
+due to changes in the LaTeX writer. While this has been fixed, most work
+has been done with docutils snapshots from version 0.5 and up. In
+balance, users are recommended to update docutils.&lt;/p&gt;
+&lt;p&gt;Not all features of beamer are supported, and some - that deal with with
+page layout or presentation - may never be. Introducing complex syntax
+to achieve complex and specific page effects defeats the point of ReST's
+simple and easy-to-write format. If you need a complex presentation, use
+Powerpoint or Keynote.&lt;/p&gt;
+&lt;p&gt;If the content for an individual slide is too large, it will simply
+overflow the edges of the slide and disappear. Arguably, this is a sign
+you should put less on each slide.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="references"&gt;
+&lt;h2&gt;References&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference external" href="http://en.wikipedia.org/wiki/Beamer_(LaTeX)"&gt;Beamer on Wikipedia&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="http://en.wikibooks.org/wiki/LaTeX/Presentations"&gt;LaTeX presentations on Wikibooks&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+</content><category term="software"></category><category term="python"></category><category term="presentation"></category><category term="script"></category></entry><entry><title>TreeMaker</title><link href="http://www.agapow.net/software/treemaker/" rel="alternate"></link><published>2006-06-01T12:00:00+01:00</published><updated>2006-06-01T12:00:00+01:00</updated><author><name>Paul Agapow</name></author><id>tag:www.agapow.net,2006-06-01:/software/treemaker/</id><summary type="html">&lt;div class="section" id="background"&gt;
+&lt;h2&gt;Background&lt;/h2&gt;
+&lt;p&gt;Biodiversity assessment demands objective measures, because ultimately
+conservation is an issue of economics, prioritizing the use of limited
+resources for preserving taxa. The most general framework for such
+metrics are those that assess evolutionary distinctiveness as judged by
+how much of a phylogeny is conserved. However, their applicability is …&lt;/p&gt;&lt;/div&gt;</summary><content type="html">&lt;div class="section" id="background"&gt;
+&lt;h2&gt;Background&lt;/h2&gt;
+&lt;p&gt;Biodiversity assessment demands objective measures, because ultimately
+conservation is an issue of economics, prioritizing the use of limited
+resources for preserving taxa. The most general framework for such
+metrics are those that assess evolutionary distinctiveness as judged by
+how much of a phylogeny is conserved. However, their applicability is
+limited by the still small proportion of taxa that have been reliably
+placed in a phylogeny. Given that this is unlikely to be corrected soon,
+alternatives are needed. Taxonomy can be used as a reasonable surrogate
+for phylogeny. Combining this with searches for combinations of local
+sites containing maximal diversity, the efficacy of any conservation
+schemes can be determined from a taxonomy of the organisms involved and
+the abundance data at potential preservation sites.&lt;/p&gt;
+&lt;p&gt;To this end, TreeMaker is software that allows the interactive building
+and editing of a taxonomy and its conversion into a phylogeny for the
+above calculations. It also allows the editing of site abundance and
+species richness data. This data may be imported from and exported to a
+variety of formats for interoperability with other programs. While it is
+mainly intended for use in conservation and biodiversity, it can be used
+as a simple tool for building phylogenies.&lt;/p&gt;
+&lt;p&gt;TreeMaker was written in RealBasic and developed under MacOSX. It was
+produced with the help of Ross Crozier and Lisa Dunnett of James Cook
+University, Australia.&lt;/p&gt;
+&lt;p&gt;If this software is used in any publication, cite:&lt;/p&gt;
+&lt;blockquote&gt;
+Ross H Crozier, Lisa J Dunnett, Paul-Michael Agapow (2005).
+Phylogenetic biodiversity assessment based on systematic
+nomenclature. &lt;em&gt;Evolutionary Bioinformatics Online&lt;/em&gt; &lt;strong&gt;1&lt;/strong&gt;:11-36.&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;div class="section" id="installation"&gt;
+&lt;h2&gt;Installation&lt;/h2&gt;
+&lt;p&gt;TreeMaker is available as a standalone program for MacOS (both OSX and
+Carbon) and Windows. Across platforms, it has only cosmetic not
+functional differences. Similarly, the datafiles TreeMaker produces may
+be used across platform. There are no special memory or library
+requirements. TreeMaker may be installed by simply copying it to an
+appropriate place on a local hardisk. To use the online help from within
+TreeMaker, the HTML manual file must be in the same directory as the
+application. Several associated programs (like MeSA and Conserve) can be
+found on this site.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="usage"&gt;
+&lt;h2&gt;Usage&lt;/h2&gt;
+&lt;p&gt;A full manual is included with the distribution.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="limitations"&gt;
+&lt;h2&gt;Limitations&lt;/h2&gt;
+&lt;p&gt;None.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="references"&gt;
+&lt;h2&gt;References&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Lisa Dunnett has also produced a program called TreeMaker with roughly equivalent functionality. It used to be found at &lt;a class="reference external" href="http://homes.jcu.edu.au/~jc125033/Treemaker.htm"&gt;http://homes.jcu.edu.au/~jc125033/Treemaker.htm&lt;/a&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+</content><category term="software"></category><category term="python"></category><category term="conservation"></category><category term="taxonomy"></category><category term="phylogenetics"></category><category term="biodiversity"></category></entry><entry><title>Conserve IV</title><link href="http://www.agapow.net/software/conserve/" rel="alternate"></link><published>2006-03-01T12:00:00+00:00</published><updated>2006-03-01T12:00:00+00:00</updated><author><name>Paul Agapow</name></author><id>tag:www.agapow.net,2006-03-01:/software/conserve/</id><summary type="html">&lt;div class="section" id="background"&gt;
+&lt;h2&gt;Background&lt;/h2&gt;
+&lt;p&gt;While it would be best to preserve all species and populations, in the
+management of biodiversity it is often necessary to perform a triage.
+Decisions must be made as to which populations, species and habitats
+should be given the highest priority.&lt;/p&gt;
+&lt;p&gt;Other things being equal, these priorities should be …&lt;/p&gt;&lt;/div&gt;</summary><content type="html">&lt;div class="section" id="background"&gt;
+&lt;h2&gt;Background&lt;/h2&gt;
+&lt;p&gt;While it would be best to preserve all species and populations, in the
+management of biodiversity it is often necessary to perform a triage.
+Decisions must be made as to which populations, species and habitats
+should be given the highest priority.&lt;/p&gt;
+&lt;p&gt;Other things being equal, these priorities should be set on the basis of
+evolutionary distinctiveness, and Conserve enables you to do this using
+genetic distances and also to test whether particular assemblages of
+populations preserve statistically significantly more biodiversity than
+other assemblages.&lt;/p&gt;
+&lt;p&gt;Archaic versions of Conserve and some source code are also made
+available in the release directory.&lt;/p&gt;
+&lt;div class="admonition note"&gt;
+&lt;p class="first admonition-title"&gt;Note&lt;/p&gt;
+&lt;p class="last"&gt;The numbering scheme inflicted upon Conserve requires some
+explanation. The current version of Conserve is actually the 4th
+iteration and full rewrite of the program. Thus it is sometimes referred
+to as&amp;nbsp;&lt;em&gt;Conserve IV&lt;/em&gt;. The archaic versions of Conserve that are still
+available are actually&amp;nbsp;&lt;em&gt;Conserve III&lt;/em&gt;. Both these series have their
+own internal version numbers. So&amp;nbsp;&lt;em&gt;Conserve IV, v1.3&lt;/em&gt;&amp;nbsp;is actually more
+recent than&amp;nbsp;&lt;em&gt;Conserve III, v3.2&lt;/em&gt;. Clear?&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</content><category term="biodiversity"></category><category term="conservation phylogenetics"></category><category term="software"></category></entry><entry><title>Mac5</title><link href="http://www.agapow.net/software/mac5/" rel="alternate"></link><published>2004-03-01T12:00:00+00:00</published><updated>2004-03-01T12:00:00+00:00</updated><author><name>Paul Agapow</name></author><id>tag:www.agapow.net,2004-03-01:/software/mac5/</id><summary type="html">&lt;div class="section" id="background"&gt;
+&lt;h2&gt;Background&lt;/h2&gt;
+&lt;p&gt;MAC5 is a program which implements MCMC sampling to estimate a
+phylogenetic tree from a DNA multiple alignment. What differentiates
+MAC5 from similar programs (e.g. BAMBE, MrBayes) is its use of
+five-state sequence evolution models as a means to include the gap
+information when estimating an alignment. Despite …&lt;/p&gt;&lt;/div&gt;</summary><content type="html">&lt;div class="section" id="background"&gt;
+&lt;h2&gt;Background&lt;/h2&gt;
+&lt;p&gt;MAC5 is a program which implements MCMC sampling to estimate a
+phylogenetic tree from a DNA multiple alignment. What differentiates
+MAC5 from similar programs (e.g. BAMBE, MrBayes) is its use of
+five-state sequence evolution models as a means to include the gap
+information when estimating an alignment. Despite vilification of these
+models in the literature in the past (e.g., Durbin et al., 1998, p.
+217), we have found that, in many circumstances, they are useful for
+improving the precision of topology estimation. &amp;nbsp; The Mac5 distribution
+is available for several platforms:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Unix: the preferred distribution due to the computational demands,
+Mac5 is available as a source tarball, and so should only be used by
+those comfortable with compiling and installing Unix software. This
+distribution includes the source, makefiles and project files for
+CodeWarrior.&lt;/li&gt;
+&lt;li&gt;Macintosh: Mac5 may be compiled for Mac OS X using the above Unix
+tarball. Otherwise a simple console versions (as a self-extracting
+archive) is available that will run on OS X and 9.&lt;/li&gt;
+&lt;li&gt;Windows: Simple console versions (as a zipped archive) are available
+that will run on Windows. This version has been only been tested
+lightly.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Mac5 was
+produced with the aid of the BBSRC (Biotechnology and Biological
+Sciences Research Council UK). &amp;nbsp; Note that due to life changes and the
+development of other software, Mac5 is no longer being developed and is
+not supported.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="usage"&gt;
+&lt;h2&gt;Usage&lt;/h2&gt;
+&lt;p&gt;Documentation for Mac5 can be found in the distribution.&lt;/p&gt;
+&lt;/div&gt;
+</content><category term="phylogenetics"></category></entry><entry><title>MeSA</title><link href="http://www.agapow.net/software/mesa/" rel="alternate"></link><published>2003-06-01T12:00:00+01:00</published><updated>2003-06-01T12:00:00+01:00</updated><author><name>Paul Agapow</name></author><id>tag:www.agapow.net,2003-06-01:/software/mesa/</id><summary type="html">&lt;div class="section" id="background"&gt;
+&lt;h2&gt;Background&lt;/h2&gt;
+&lt;p&gt;Phylogenies are smoking guns. An evolutionary history carrys in its very
+shape the fingerprints of every process that effected its creation:
+extinctions, key adaptations, radiations, colonizations, changes in the
+tempo and mode of macroevolution.&lt;/p&gt;
+&lt;p&gt;Unfortunately analysing phylogenies is difficult. The calculations of
+interest to any investigator are sometimes intricate …&lt;/p&gt;&lt;/div&gt;</summary><content type="html">&lt;div class="section" id="background"&gt;
+&lt;h2&gt;Background&lt;/h2&gt;
+&lt;p&gt;Phylogenies are smoking guns. An evolutionary history carrys in its very
+shape the fingerprints of every process that effected its creation:
+extinctions, key adaptations, radiations, colonizations, changes in the
+tempo and mode of macroevolution.&lt;/p&gt;
+&lt;p&gt;Unfortunately analysing phylogenies is difficult. The calculations of
+interest to any investigator are sometimes intricate and
+labour-intensive. They are also often across several programs, if there
+is a software implementation at all. The statistical significance of
+results often require the comparison of hundreds to thousands of trees.
+Finally, metrics may be fragile to the mode of evolution a phylogeny
+grew under. The result of these problems is that phylogenetic analysis
+is often hard work, and it is difficult to know what to make of the
+answers.&lt;/p&gt;
+&lt;p&gt;MeSA is an software application designed to alleviate these problems.
+Although MeSA really only does four things, The big win for
+investigators is that all these are in the one software package and can
+be used in conjunction with each other, and semi-automated. Thus, the
+problems of transferring data between programs and possible corruption
+or misintepretation of results are avoided. The four big features of
+MeSA are:&lt;/p&gt;
+&lt;dl class="docutils"&gt;
+&lt;dt&gt;Manipulations:&lt;/dt&gt;
+&lt;dd&gt;MeSA allows datasets to be manipulated in sophisticated ways.
+Phylogenetic trees and life history traits can be edited, duplicated
+or deleted. Branchlengths can be systematically modified, taxa
+deleted according to complex conditions, traits modified globally
+and selectively. The entire dataset can also be backed up and
+restored at any moment.&lt;/dd&gt;
+&lt;dt&gt;Analyses:&lt;/dt&gt;
+&lt;dd&gt;MeSA incorporates a large number of calculations that can analyse
+diversity within a phylogeny (e.g. phylogenetic diversity),
+diversity across communities (e.g. Shannon-Weiner index), measures
+of macroevolutionary process (e.g. Fusco-Cronk imbalance), and
+gather information selectively across taxa&lt;/dd&gt;
+&lt;dt&gt;Simulations:&lt;/dt&gt;
+&lt;dd&gt;MeSA allows phylogenies to be grown under sophisticated scenarios
+where speciation and extinction rates can be effected by the traits
+of the taxa involved or global attributes of the phylogeny.
+Simulations can be further adorned by mass extinctions and the
+evolution of life history traits.&lt;/dd&gt;
+&lt;dt&gt;Automation:&lt;/dt&gt;
+&lt;dd&gt;In order to allow the production and testing of a large number of
+phylogenies, MeSA lets users construct chains of actions
+(manipulations, analyses and simulations) that may be run as a
+single unit, looping over groups of commands, saving and restoring
+data. Thus one may easily generate test a large number of replicates
+for statistical validity.&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;p&gt;MeSA is unrelated to the graphics library, spreadsheet, airline,
+academic association, college,search engine, engineering society, town
+or topographical feature of the same name.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="installation"&gt;
+&lt;h2&gt;Installation&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="usage"&gt;
+&lt;h2&gt;Usage&lt;/h2&gt;
+&lt;p&gt;A manual, of sorts, is included with the distribution.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="limitations"&gt;
+&lt;h2&gt;Limitations&lt;/h2&gt;
+&lt;p&gt;Some caveats are given in the manual. In brief, when simulating the evolution of continuous traits it is necessary to discretize time. That is, for efficienecy MeSA simulates traits measured with real number as a series of &amp;quot;jumps&amp;quot; in time and trait value rather than smooth variation. If the jumps are small enough, this should not matter. The user may set the 'grain' of the simulation to determine the size of time steps. The smaller the value, the more accurate it will be, but the slower the simulation will run. Users should run tests and settle on a compromise value.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="references"&gt;
+&lt;h2&gt;References&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;ul class="first"&gt;
+&lt;li&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+</content><category term="software"></category><category term="python"></category><category term="phylogenetics"></category><category term="macroevolution"></category><category term="biodiversity"></category></entry><entry><title>Multilocus</title><link href="http://www.agapow.net/software/multilocus/" rel="alternate"></link><published>2001-12-01T12:00:00+00:00</published><updated>2001-12-01T12:00:00+00:00</updated><author><name>Paul Agapow</name></author><id>tag:www.agapow.net,2001-12-01:/software/multilocus/</id><summary type="html">&lt;div class="section" id="background"&gt;
+&lt;h2&gt;Background&lt;/h2&gt;
+&lt;p&gt;This program has been written to facilitate analysis of multi-locus
+population genetic data. In particular, it allows calculation of various
+genotypic diversity indices, various linkage disequilibrium indices, and
+a measure of population differentiation, and allows one to search for
+subpopulations which do not share polymorphisms (and thus might be …&lt;/p&gt;&lt;/div&gt;</summary><content type="html">&lt;div class="section" id="background"&gt;
+&lt;h2&gt;Background&lt;/h2&gt;
+&lt;p&gt;This program has been written to facilitate analysis of multi-locus
+population genetic data. In particular, it allows calculation of various
+genotypic diversity indices, various linkage disequilibrium indices, and
+a measure of population differentiation, and allows one to search for
+subpopulations which do not share polymorphisms (and thus might be
+reproductively isolated). It includes a modification of the IA (Index of
+Association) metric that corrects the scaling effect seen when one
+applies the metric to different numbers of loci. In addition, there are
+randomization routines which allow one to test various null hypotheses.&lt;/p&gt;
+&lt;p&gt;If this software is used in any publication, cite:&lt;/p&gt;
+&lt;blockquote&gt;
+Agapow &amp;amp; Burt (2001) “Indices of multilocus linkage disequilibrium”, &lt;em&gt;Molecular Ecology Notes&lt;/em&gt; &lt;strong&gt;1&lt;/strong&gt;, pp101-102.&lt;/blockquote&gt;
+&lt;p&gt;Due to life and career changes, enquiries about technical matters and
+the future of Multilocus should be directed to &lt;a class="reference external" href="mailto://a.burt&amp;#64;imperial.ac.uk"&gt;Austin
+Burt&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="installation"&gt;
+&lt;h2&gt;Installation&lt;/h2&gt;
+&lt;p&gt;Precompiled binaries are available for several platforms. It can also be compiled from source. In a unix-like environment (Linux, OSX, etc.), this can be done with the usual unix incantations:&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+# unpack the archive
+% tar zxvf multilocus-1.3.tgz
+# change into the archive
+% cd multilocus-1.3
+# configure
+% ./configure
+# compile
+% make
+[...]
+&lt;/pre&gt;
+&lt;p&gt;The compiled executable can now be moved to any useful location.&lt;/p&gt;
+&lt;p&gt;The code can probably be compiled in other environments using other compilers. I cannot help you with this.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="usage"&gt;
+&lt;h2&gt;Usage&lt;/h2&gt;
+&lt;p&gt;A full manual is included in the distribution.&lt;/p&gt;
+&lt;div class="section" id="limitations"&gt;
+&lt;h3&gt;Limitations&lt;/h3&gt;
+&lt;p&gt;Pay attention to the input formats defined in the manual. Input files are plaintext files not Word or Excel documents.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="references"&gt;
+&lt;h2&gt;References&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Agapow &amp;amp; Burt (2001) “Indices of multilocus linkage disequilibrium”, &lt;em&gt;Molecular Ecology Notes&lt;/em&gt; &lt;strong&gt;1&lt;/strong&gt;, pp101-102&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+</content><category term="population-genetics"></category><category term="C++"></category><category term="software"></category><category term="commandline"></category></entry></feed>

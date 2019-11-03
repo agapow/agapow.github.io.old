@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="">
+<head>
+	<meta charset="utf-8"/>
+	<title>Notes on LaTeX on OSX - Make More Machines</title>
+	<meta name="author" content="Paul Agapow">
+
+
+  <meta name="description" content="Recently, I had to do a presentation and so turned to my favoured quick slide format rst2beamer. Write something in plain text (okay, restructured text), convert it to beamer-flavoured LaTeX, run LaTeX and you're done. Of course, I failed to reckon with the teetering byzantine stack that is your average …">
+
+	<meta name="twitter:card" content="summary">
+	  <meta name="twitter:creator" content="@agapow">
+	<meta name="twitter:title" content="Notes on LaTeX on OSX">
+	<meta name="twitter:description" content="Recently, I had to do a presentation and so turned to my favoured quick slide format rst2beamer. Write something in plain text (okay, restructured text), convert it to beamer-flavoured LaTeX, run LaTeX and you're done. Of course, I failed to reckon with the teetering byzantine stack that is your average …">
+	<meta name="twitter:url" content="http://www.agapow.net/drafts/notes-on-latex-on-osx.html">
+
+
+	<link rel="stylesheet" href="http://www.agapow.net/theme/css/main.css" type="text/css" />
+
+
+
+    <link href="http://www.agapow.net/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Make More Machines Atom Feed" />
+</head>
+
+<body>
+
+    <div class="container">
+
+	  <header role="banner">
+	    <div class="feeds">
+	      <a href="http://www.agapow.net/feeds/all.atom.xml" rel="alternate"><img src="http://www.agapow.net/theme/images/icons/feed-32px.png" alt="atom feed"/></a>
+	    </div>
+	      <nav class="pages">
+			  <a href="http://www.agapow.net/about">About</a>
+-			  <a href="http://www.agapow.net/whereabouts">Whereabouts</a>
+	      </nav>
+		<a href="http://www.agapow.net" class="title">Make More Machines</a>&nbsp;&nbsp;(agapow.net)
+      </header>
+
+	  <div class="wrapper">
+
+		  <div role="main" class="content">
+	<article class="full">
+
+		<h1>Notes on LaTeX on OSX</h1>
+
+<div class="metadata">
+  <time datetime="2015-06-23T00:00:00+01:00" pubdate>2015-06-23</time>
+    <address class="vcard author">
+      by <a class="url fn" href="http://www.agapow.net/False">Paul Agapow</a>
+    </address>
+  in <a href="http://www.agapow.net/misc/">misc</a>
+<p class="tags">tagged <a href="http://www.agapow.net//by-tag/latex/">latex</a>, <a href="http://www.agapow.net//by-tag/tex/">tex</a>, <a href="http://www.agapow.net//by-tag/beamer/">beamer</a>, <a href="http://www.agapow.net//by-tag/osx/">osx</a>, <a href="http://www.agapow.net//by-tag/mac/">mac</a></p></div>
+		<div class="summary">I though this was supposed to save me work ...</div>
+
+
+      <p>Recently, I had to do a presentation and so turned to my favoured quick slide format <em>rst2beamer</em>. Write something in plain text (okay, restructured text), convert it to beamer-flavoured LaTeX, run LaTeX and you're done. Of course, I failed to reckon with the teetering byzantine stack that is your average TeX installation, so I spent nearly 6 hours sorting that out. These are some notes collected along the way, detailing what I had to do get it all running under Mac OSX including some faffing with beamer and fonts. Partly it's a reminder for myself, partly it's for any other poor souls that have to deal with this.</p>
+<ul>
+<li><p class="first"><em>TeXLive</em> is the favoured distribution for OSX, with the <em>TeXShop</em> application as a nice GUI frontend.</p>
+</li>
+<li><p class="first"><em>brew</em> has an option for installing <em>texlive</em> ... but it doesn't work. You'll need to manually downloaded an installer and run it.</p>
+</li>
+<li><p class="first">Some thing that escaped my attention until now was that TeXLive has a package manager, <em>tlmgr</em>. This is largely sensible and saves you having to put all sorts of  files in all sorts of complex and wierd places. However, I had to run it as a superuser to get it to work.</p>
+</li>
+<li><p class="first">Over time you will accumulate your own style &amp; class files that you'll want TeX to automatically find. This being TeX, there's a dozen different fiddly solutions. There are two sane ways to do this:</p>
+<blockquote>
+<ul>
+<li><p class="first">Have them in the current directory / the directory your source is in / <cite>.</cite>.</p>
+</li>
+<li><p class="first">Have a local TeX directory and tell TeX about it:</p>
+<blockquote>
+<ul class="simple">
+<li>Run <cite>kpsewhich -var-value=TEXMFHOME</cite> to see what it is set to. Note this directory need not actually exist, so you may have to create it. Drop some of your files in there.</li>
+<li>Test that they can be found with <cite>kpsewhich myfile</cite></li>
+<li>Some say that <cite>texhash</cite> is needed to get things to update and recognise the new directory. It didn't work for me and I had to insert something like <cite>export TEXINPUTS=&quot;.:~/.texmf:&quot;</cite> into my <em>.bashrc</em></li>
+<li>Some allege that the local directory must follow the TDS (TeX directory layout) but this seems to be not the case for me.</li>
+</ul>
+</blockquote>
+</li>
+</ul>
+</blockquote>
+</li>
+<li><p class="first">Fonts - argh. XeLaTeX can use proper (i.e. non-LateX) fonts to make very swish PDF output. Of course, there's issues ...</p>
+<blockquote>
+<ul class="simple">
+<li>It finds normal fonts in OSX, that you install the usual way (i.e. &quot;open&quot; them in Font Manager and click &quot;install&quot;)</li>
+<li>I had an (autogenerated) directive in my tex <cite>usepackage[latin1]{inputenc}</cite> that XeLaTeX didn't like at all, objecting to the &quot;latin1&quot; as an encoding it didn't understand. Fair enough, although when I tried to change this to <em>utf8</em>, it didn't like that either. So I just deleted the statement.</li>
+</ul>
+</blockquote>
+</li>
+</ul>
+
+
+	</article>
+
+    <p>
+	<a href="https://twitter.com/share" class="twitter-share-button" data-via="" data-lang="en" data-size="large" data-related="">Tweet</a>
+	<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+	</p>
+
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = 'agapow';
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
+		  </div>
+
+		  <div class="sidebar">
+		    <div class="sidebar-container" >
+
+
+	            <aside>
+	              <h2>About</h2>
+			      <p class='summary'>
+                  This site has just been restored, with most of the content
+						translated automatically from its old form. Expect bugs,
+						missing information and general wierdness as things
+						get sorted out.
+			      </p>
+			    </aside>
+
+
+  	          <nav>
+	            <h2>Categories</h2>
+	            <ul>
+	                <li class="active"><a href="http://www.agapow.net/misc/">misc</a></li>
+	                <li ><a href="http://www.agapow.net/personal/">personal</a></li>
+	                <li ><a href="http://www.agapow.net/programming/">programming</a></li>
+	                <li ><a href="http://www.agapow.net/publications/">publications</a></li>
+	                <li ><a href="http://www.agapow.net/science/">science</a></li>
+	                <li ><a href="http://www.agapow.net/software/">software</a></li>
+	                <li ><a href="http://www.agapow.net/talks/">talks</a></li>
+	            </ul>
+
+	            <ul>
+	              <li><a href="http://www.agapow.net/tags.html">all tags</a></li>
+	            </ul>
+	          </nav>
+
+	            <aside>
+	            <h2>Social</h2>
+			      <ul class="social">
+				    <li><a href="http://twitter.com/agapow">Twitter</a><i></i></li>
+				    <li><a href="http://github.com/agapow">Github</a><i></i></li>
+				    <li><a href="https://plus.google.com/u/0/113920832845886210876/posts">Google+</a><i></i></li>
+				    <li><a href="http://uk.linkedin.com/pub/paul-michael-agapow/2/15b/184/">linkedIn</a><i></i></li>
+			      </ul>
+			    </aside>
+
+	            <aside>
+	              <h2>Links</h2>
+	              <ul>
+	                  <li><a href="http://www.imperial.ac.uk/data-science/">IC Data Science Institute</a></li>
+	                  <li><a href="http://www.meetup.com/Bioinformatics-London">Bioinformatics London</a></li>
+	              </ul>
+	            </aside>
+
+<a class="twitter-timeline" data-dnt="true" href="https://twitter.com/agapow" data-widget-id="336428520026812416">Tweets by @agapow</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+	        </div>
+		  </div>
+
+	  </div>
+
+      <footer>
+		<p role="contentinfo">
+		  Paul Agapow - Proudly powered by <a href="http://alexis.notmyidea.org/pelican/">pelican</a>. Theme <a href="https://github.com/fle/pelican-sober">pelican-sober</a>.
+    	</p>
+
+	  </footer>
+
+	</div>
+
+
+</body>
+</html>

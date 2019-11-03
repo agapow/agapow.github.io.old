@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="">
+<head>
+	<meta charset="utf-8"/>
+	<title>Big biomedical data: the hype and reality - Make More Machines</title>
+	<meta name="author" content="Paul Agapow">
+
+
+  <meta name="description" content="This is a distillation of several talks I've given recently centered around the idea that machine learning in healthcare and biomedicine is massively overhyped, misunderstood and perhaps ill-suited to many of the problems that have to be solved. To be clear, I not an total sceptic. In fact I think …">
+
+	<meta name="twitter:card" content="summary">
+	  <meta name="twitter:creator" content="@agapow">
+	<meta name="twitter:title" content="Big biomedical data: the hype and reality">
+	<meta name="twitter:description" content="This is a distillation of several talks I've given recently centered around the idea that machine learning in healthcare and biomedicine is massively overhyped, misunderstood and perhaps ill-suited to many of the problems that have to be solved. To be clear, I not an total sceptic. In fact I think …">
+	<meta name="twitter:url" content="http://www.agapow.net/drafts/big-biomedical-data-the-hype-and-reality.html">
+
+
+	<link rel="stylesheet" href="http://www.agapow.net/theme/css/main.css" type="text/css" />
+
+
+
+    <link href="http://www.agapow.net/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Make More Machines Atom Feed" />
+</head>
+
+<body>
+
+    <div class="container">
+
+	  <header role="banner">
+	    <div class="feeds">
+	      <a href="http://www.agapow.net/feeds/all.atom.xml" rel="alternate"><img src="http://www.agapow.net/theme/images/icons/feed-32px.png" alt="atom feed"/></a>
+	    </div>
+	      <nav class="pages">
+			  <a href="http://www.agapow.net/about">About</a>
+-			  <a href="http://www.agapow.net/whereabouts">Whereabouts</a>
+	      </nav>
+		<a href="http://www.agapow.net" class="title">Make More Machines</a>&nbsp;&nbsp;(agapow.net)
+      </header>
+
+	  <div class="wrapper">
+
+		  <div role="main" class="content">
+	<article class="full">
+
+		<h1>Big biomedical data: the hype and reality</h1>
+
+<div class="metadata">
+  <time datetime="2018-07-11T12:00:00+01:00" pubdate>2018-07-11</time>
+    <address class="vcard author">
+      by <a class="url fn" href="http://www.agapow.net/False">Paul Agapow</a>
+    </address>
+  in <a href="http://www.agapow.net/science/">science</a>
+<p class="tags">tagged <a href="http://www.agapow.net//by-tag/bioinformatics/">bioinformatics</a>, <a href="http://www.agapow.net//by-tag/academia/">academia</a></p></div>
+		<div class="summary">How useful are big data and machine learning for biomedicine?</div>
+
+
+      <p>This is a distillation of <a class="reference external" href="https://www.slideshare.net/PaulMichaelAgapow">several talks I've given recently</a> centered around the idea that machine learning in healthcare and biomedicine is massively overhyped, misunderstood and perhaps ill-suited to many of the problems that have to be solved. To be clear, I not an total sceptic. In fact I think that data-driven biology is the way of the future. But to reach that future, problems have to be recognised, admitted and tackled. There are certainly pragmatic solutions to many of the problems I list below, but that's a subject for another post.</p>
+<p>share to linked in / twotter</p>
+<div class="section" id="the-problems-or-obstacles">
+<h2>The problems or obstacles</h2>
+<div class="section" id="big-biomedical-data-is-a-lie">
+<h3>Big biomedical data is a lie</h3>
+<p>Despite all the talk of biomedical big data, largely it doesn't exist.</p>
+<ul class="simple">
+<li>The average trial size on ClinicalTrials.gov is less than 100</li>
+<li>The average #samples per GEO dataset &lt; 100</li>
+<li>Average GWAS cohort size ~9000 (and this is skewwed by several v. large studies, the median ~2500)</li>
+<li>Real world populations will fall short ( 1,064 ICU admissions for flu in UK 2016/2017 season)</li>
+</ul>
+<p>labelled data is the new oil</p>
+<p>These fall well short of the numbers ideally required by many analytical approaches:</p>
+<ul class="simple">
+<li>Curse of dimensionality means that we should have more samples than features</li>
+<li>Deep learning requires “thousands” of samples for training (at least p^2?)</li>
+<li>GWAS needs 3K+ for large effects, 10K or more for small effects ... (and maybe millions for mental illness, see recent paper)</li>
+<li>Sub-populations &amp; rare diseases will be smaller</li>
+</ul>
+<p>machine learning in biomedicine:
+- lack of labelled datasets (of sufficient size)
+- sampling bias
+- intepretability problem
+- less sexy techniques work just as well
+- descent by graduate student
+- overfitting ...</p>
+<p>Sampling bias
+P-hacking
+Garden of forking paths Reversion to mean Multiple hypothesis testing False discovery
+P-values
+Which method is best?
+Omnigenics (every gene effects every other gene)</p>
+<p>Biomedical data lakes / warehouses aren’t working
+Each is an island unto itself
+Tools can’t understand data formats
+High demands on user (meaning, context)
+Poor standardisation / harmonisation tools (curation effort == analysis effort)
+A world of distributed data
+A world of many computational idioms
+(Self) lock-in</p>
+<p>Compuattaiinal idioms</p>
+<p>Data is embiggening
+Can’t rely on cheap computation to get us out of a hole
+Many HPC idioms, most awkward (e.g. Map-Reduce)
+Db schema struggle at scale</p>
+</div>
+<div class="section" id="we-constantly-solve-the-wrong-problem">
+<h3>We constantly solve the wrong problem</h3>
+<p>Computer scientists are continually their impression of a problem which, unfortunately, is not the actual problem. This is practically every machine learning / ai in biomedicine conference. The Google flu trends project is a good example. By analysing social media, a Google team could predict how many people had flu two weeks before</p>
+<p>(Note: the similar project for Dengue Fever seems much more useful, given that dengue is much harder to quantify and track.)</p>
+<p>real world evidence
+Failure to reuse models
+And that. model != actionable
+- not everything is an image
+- we don't actually have biomdecial big data
+- if used naively, just gives you back what you told it
+- each model is its own kingdom</p>
+</div>
+<div class="section" id="the-problems-with-deep-models">
+<h3>The problems with deep models</h3>
+<p>While this largely refers to deep leanring, below I'll talk about &quot;deep models&quot; to include other computationally intense methods that learn data to build complex models that can classify or otherwise transform data.</p>
+<div class="section" id="deep-models-are-not-always-the-best-choice">
+<h4>Deep models are not always the best choice</h4>
+<p>Usually insufficient (good labelled) data
+Interpretability issues</p>
+<p>The flipside of deep learning models beging able to infer high level features in data that are not explicitly encoded by users and use these for classification is that deep learning models will use features not encoded or intended by users. For example:</p>
+<ul class="simple">
+<li>The Google Flu trends fixated in part on reports of basketball matches, because these tended to happen at the same time of year as flu outbreaks.</li>
+<li>A deep learning model trained to distinguish wolves from huskies picked up on the snow present in the background of wolve pcitures.</li>
+<li>Similarly, a model trained to distinguish melanomas from harmless moles identified the ruler that was usually laid along clinical picturess of melanomoas.</li>
+</ul>
+<p>And these are gross &quot;tells&quot;, obvious tot he observer. What more subtle clues might be possible - exposure / light levels in photos, patinet outcomes shaped by hospital catchment area and thus socio-economic and hospital speiclaities</p>
+<p>In a larger sense, models as they now stand tells you what you’ve told it</p>
+</div>
+</div>
+<div class="section" id="bias-towards-images">
+<h3>Bias towards images</h3>
+<p>Many of the early and prominent successes in deep learning have used images, for example interpreting radiological images, detecting tumours in scans, etc. But in many ways this success is deceptive. Intepreting biomedical mages is a problem that is remarkably well-formed for deep models:</p>
+<ul class="simple">
+<li>There's already a huge prior art in image recognition that has penetrated all the way down to the consumer level (e.g. Google Image Search)</li>
+<li>There's a large body of labelled data for image classification</li>
+<li>Image data is already structured in a useful way for analysis</li>
+</ul>
+</div>
+<div class="section" id="practical-issues-in-the-use-of-deep-learning">
+<h3>Practical issues in the use of deep learning</h3>
+<p>There are also considerable stumbling blocks for deep learning when it comes to accessing data. A growing amount of data is tied up in hospital, registry amd other secure systems, where privacy and governance issues loom large. The appropriate mechanisms and means for accessing this data are not yet in palce and hospitals are suspicious.</p>
+<p>Furthermore, there is a trend for access of this data to be done in a federated manner - where the compuaution is taken to the data and only summary or population results are returned. We do not as yet have useful deep leanirng models that can work in this way.</p>
+<p>Myra Spilopoulou - there is a difference between what is technically possible and what is permitted</p>
+</div>
+<div class="section" id="interpretability-and-actionability-issues">
+<h3>Interpretability and actionability issues</h3>
+</div>
+</div>
+<div class="section" id="ripostes-and-counter-arguments">
+<h2>Ripostes and counter-arguments</h2>
+<div class="section" id="but-we-don-t-do-that-we-re-really-careful">
+<h3>But we don't do that / we're really careful</h3>
+<p>Argument from exceptionalism</p>
+</div>
+<div class="section" id="but-we-ve-involved-doctors">
+<h3>But we've involved doctors</h3>
+<p>That's the very least you could do</p>
+</div>
+<div class="section" id="couldn-t-this-be-said-of-all-algorithmic-approaches">
+<h3>Couldn't this be said of all algorithmic approaches?</h3>
+<p>Yes. Not to the same extent. I think machine learning has bought forward and emphasized a bunch of problems that were already there. But lets not throw out the baby with the bathwater. It's a question of using it properly.</p>
+</div>
+</div>
+<div class="section" id="conclusions">
+<h2>Conclusions</h2>
+</div>
+
+
+	</article>
+
+    <p>
+	<a href="https://twitter.com/share" class="twitter-share-button" data-via="" data-lang="en" data-size="large" data-related="">Tweet</a>
+	<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+	</p>
+
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = 'agapow';
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
+		  </div>
+
+		  <div class="sidebar">
+		    <div class="sidebar-container" >
+
+
+	            <aside>
+	              <h2>About</h2>
+			      <p class='summary'>
+                  This site has just been restored, with most of the content
+						translated automatically from its old form. Expect bugs,
+						missing information and general wierdness as things
+						get sorted out.
+			      </p>
+			    </aside>
+
+
+  	          <nav>
+	            <h2>Categories</h2>
+	            <ul>
+	                <li ><a href="http://www.agapow.net/misc/">misc</a></li>
+	                <li ><a href="http://www.agapow.net/personal/">personal</a></li>
+	                <li ><a href="http://www.agapow.net/programming/">programming</a></li>
+	                <li ><a href="http://www.agapow.net/publications/">publications</a></li>
+	                <li class="active"><a href="http://www.agapow.net/science/">science</a></li>
+	                <li ><a href="http://www.agapow.net/software/">software</a></li>
+	                <li ><a href="http://www.agapow.net/talks/">talks</a></li>
+	            </ul>
+
+	            <ul>
+	              <li><a href="http://www.agapow.net/tags.html">all tags</a></li>
+	            </ul>
+	          </nav>
+
+	            <aside>
+	            <h2>Social</h2>
+			      <ul class="social">
+				    <li><a href="http://twitter.com/agapow">Twitter</a><i></i></li>
+				    <li><a href="http://github.com/agapow">Github</a><i></i></li>
+				    <li><a href="https://plus.google.com/u/0/113920832845886210876/posts">Google+</a><i></i></li>
+				    <li><a href="http://uk.linkedin.com/pub/paul-michael-agapow/2/15b/184/">linkedIn</a><i></i></li>
+			      </ul>
+			    </aside>
+
+	            <aside>
+	              <h2>Links</h2>
+	              <ul>
+	                  <li><a href="http://www.imperial.ac.uk/data-science/">IC Data Science Institute</a></li>
+	                  <li><a href="http://www.meetup.com/Bioinformatics-London">Bioinformatics London</a></li>
+	              </ul>
+	            </aside>
+
+<a class="twitter-timeline" data-dnt="true" href="https://twitter.com/agapow" data-widget-id="336428520026812416">Tweets by @agapow</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+	        </div>
+		  </div>
+
+	  </div>
+
+      <footer>
+		<p role="contentinfo">
+		  Paul Agapow - Proudly powered by <a href="http://alexis.notmyidea.org/pelican/">pelican</a>. Theme <a href="https://github.com/fle/pelican-sober">pelican-sober</a>.
+    	</p>
+
+	  </footer>
+
+	</div>
+
+
+</body>
+</html>

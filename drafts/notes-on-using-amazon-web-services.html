@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="">
+<head>
+	<meta charset="utf-8"/>
+	<title>Notes on using Amazon Web Services - Make More Machines</title>
+	<meta name="author" content="Paul Agapow">
+
+
+  <meta name="description" content="Configuration lag Obviously if you modify a server and it needs to reboot, there will be a delay before any changes can take effect. But some pure software changes can take time to propagate: e.g. Elastic IP associations, access policies. Changes to user acounts (e.g. access & permissions) may …">
+
+	<meta name="twitter:card" content="summary">
+	  <meta name="twitter:creator" content="@agapow">
+	<meta name="twitter:title" content="Notes on using Amazon Web Services">
+	<meta name="twitter:description" content="Configuration lag Obviously if you modify a server and it needs to reboot, there will be a delay before any changes can take effect. But some pure software changes can take time to propagate: e.g. Elastic IP associations, access policies. Changes to user acounts (e.g. access & permissions) may …">
+	<meta name="twitter:url" content="http://www.agapow.net/drafts/notes-on-using-amazon-web-services.html">
+
+
+	<link rel="stylesheet" href="http://www.agapow.net/theme/css/main.css" type="text/css" />
+
+
+
+    <link href="http://www.agapow.net/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Make More Machines Atom Feed" />
+</head>
+
+<body>
+
+    <div class="container">
+
+	  <header role="banner">
+	    <div class="feeds">
+	      <a href="http://www.agapow.net/feeds/all.atom.xml" rel="alternate"><img src="http://www.agapow.net/theme/images/icons/feed-32px.png" alt="atom feed"/></a>
+	    </div>
+	      <nav class="pages">
+			  <a href="http://www.agapow.net/about">About</a>
+-			  <a href="http://www.agapow.net/whereabouts">Whereabouts</a>
+	      </nav>
+		<a href="http://www.agapow.net" class="title">Make More Machines</a>&nbsp;&nbsp;(agapow.net)
+      </header>
+
+	  <div class="wrapper">
+
+		  <div role="main" class="content">
+	<article class="full">
+
+		<h1>Notes on using Amazon Web Services</h1>
+
+<div class="metadata">
+  <time datetime="2015-11-27T00:00:00+00:00" pubdate>2015-11-27</time>
+    <address class="vcard author">
+      by <a class="url fn" href="http://www.agapow.net/False">Paul Agapow</a>
+    </address>
+  in <a href="http://www.agapow.net/programming/">programming</a>
+<p class="tags">tagged <a href="http://www.agapow.net//by-tag/cloud/">cloud</a>, <a href="http://www.agapow.net//by-tag/aws/">aws</a>, <a href="http://www.agapow.net//by-tag/ec2/">ec2</a>, <a href="http://www.agapow.net//by-tag/ses/">ses</a>, <a href="http://www.agapow.net//by-tag/rds/">rds</a></p></div>
+		<div class="summary">Assorted notes on using AWS.</div>
+
+
+      <div class="section" id="configuration-lag">
+<h2>Configuration lag</h2>
+<p>Obviously if you modify a server and it needs to reboot, there will be a delay before any changes can take effect. But some pure software changes can take time to propagate: e.g. Elastic IP associations, access policies.</p>
+<p>Changes to user acounts (e.g. access &amp; permissions) may require logging out and in again.</p>
+</div>
+<div class="section" id="mail">
+<h2>Mail</h2>
+<p>Your server may not be intended primarily for communication, but many (if not most) will need to send out mail or communicate in some way. Wherever possible, notifications should be sent by Amazon SNS (Simple Notification Service), a robust service for handling onw-way mesaging. Messages can be divided into &quot;channels&quot; that can be subscribed by different consumers, and retransmitted in different ways. System alerts, heartbeats and errors can be usefully transmitted in this way.</p>
+<p>This doesn't include mail, which many  systems will need to send, if only for initial passwords and password resets. Just naively installing postfix and sending mail may get all your mail labelled as spam: the IP range for Amazon's EC2 instances is broadly listed in many spam blacklists. If you deploy an Elastic Benastalk instance, which comes with whatever default mail setup the EB images use, these also will be labelled as spam.</p>
+<p>There's a number of possible solutions:</p>
+<ul class="simple">
+<li>Relay your mail via a trusted server. For example, you could setup SSMTP and connect to a Gmail SMTP server. This would be especially suitable for situations where a server needs to send only a few bits of mail.</li>
+<li>Amazon does have a page where you can ask for mail from a given ELastic IP to be sent through a trusted server. Note that this will not work for situations like ELastic Beanstalk where the originating server may not have a fixed IP.</li>
+<li>Use SES</li>
+</ul>
+<p>Amazon's SES (Simple Email Service) is not labelled as spam, but has some non-obvious behaviours:</p>
+<ul>
+<li><p class="first">SES is available to everyone but by default use is restricted to a &quot;sandbox&quot; where mail can only be sent from and to &quot;verified&quot; addresses (i.e. addresses that have responded to a verification email). This is obvously useless, and to escape the sandbox one must apply to Amazon. Fortunately, they seem to freely release you from to the sandbox to the real service.</p>
+</li>
+<li><p class="first">To use the service requires that you create credentials. These are slightly different to other AWS credentials. This creates an IAM user and two alphanumeric strings: one for the SMTP username and one for the SMTP password.</p>
+</li>
+<li><p class="first">You will also be assigned an SMTP endpoint (server), with 3 possible ports for connnecting. However, not all ports are equal:</p>
+<blockquote>
+<ul class="simple">
+<li>I've never had any success with connecting to the low port.</li>
+<li>The permissions / use of the high port is tricky, and it will often return the error message &quot;unverified user&quot;.</li>
+<li>The middle port (465) seems to be the simplest to use. TLS must be enabled. You may need to still mail from a verified address.</li>
+</ul>
+</blockquote>
+</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Had some strange behaviour here - could swear that initially you didn't need an IAM user for SES, but this requirement changed at some point. Also, the differences between the ports doesn't seem to be documented anywhere.</p>
+</div>
+</div>
+<div class="section" id="rds">
+<h2>RDS</h2>
+<p>Is Amazon's &quot;database as a service&quot; service.</p>
+<ul class="simple">
+<li>AWS is very big on encourgaing you to go for Multi-AZ (replicate the db across zones) and IOPS storage (special 'fast' storage). This will approximately double your costs and it's probably not needed in many cases.</li>
+<li>Had some problems with RDS Postgres. The root user of the database isn't root in a weird way. It is a &quot;master user&quot; and doesn't have the permission &quot;SUPERUSER&quot; but &quot;RDS_SUPERUSER&quot;. This new permission is mostly like a superuser, modified to allow a replicated, hosted service. However, I encountered some odd behaviour where I couldn't create a role with that permission, but only create a role and grant that permission.</li>
+</ul>
+</div>
+
+
+	</article>
+
+    <p>
+	<a href="https://twitter.com/share" class="twitter-share-button" data-via="" data-lang="en" data-size="large" data-related="">Tweet</a>
+	<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+	</p>
+
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = 'agapow';
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
+		  </div>
+
+		  <div class="sidebar">
+		    <div class="sidebar-container" >
+
+
+	            <aside>
+	              <h2>About</h2>
+			      <p class='summary'>
+                  This site has just been restored, with most of the content
+						translated automatically from its old form. Expect bugs,
+						missing information and general wierdness as things
+						get sorted out.
+			      </p>
+			    </aside>
+
+
+  	          <nav>
+	            <h2>Categories</h2>
+	            <ul>
+	                <li ><a href="http://www.agapow.net/misc/">misc</a></li>
+	                <li ><a href="http://www.agapow.net/personal/">personal</a></li>
+	                <li class="active"><a href="http://www.agapow.net/programming/">programming</a></li>
+	                <li ><a href="http://www.agapow.net/publications/">publications</a></li>
+	                <li ><a href="http://www.agapow.net/science/">science</a></li>
+	                <li ><a href="http://www.agapow.net/software/">software</a></li>
+	                <li ><a href="http://www.agapow.net/talks/">talks</a></li>
+	            </ul>
+
+	            <ul>
+	              <li><a href="http://www.agapow.net/tags.html">all tags</a></li>
+	            </ul>
+	          </nav>
+
+	            <aside>
+	            <h2>Social</h2>
+			      <ul class="social">
+				    <li><a href="http://twitter.com/agapow">Twitter</a><i></i></li>
+				    <li><a href="http://github.com/agapow">Github</a><i></i></li>
+				    <li><a href="https://plus.google.com/u/0/113920832845886210876/posts">Google+</a><i></i></li>
+				    <li><a href="http://uk.linkedin.com/pub/paul-michael-agapow/2/15b/184/">linkedIn</a><i></i></li>
+			      </ul>
+			    </aside>
+
+	            <aside>
+	              <h2>Links</h2>
+	              <ul>
+	                  <li><a href="http://www.imperial.ac.uk/data-science/">IC Data Science Institute</a></li>
+	                  <li><a href="http://www.meetup.com/Bioinformatics-London">Bioinformatics London</a></li>
+	              </ul>
+	            </aside>
+
+<a class="twitter-timeline" data-dnt="true" href="https://twitter.com/agapow" data-widget-id="336428520026812416">Tweets by @agapow</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+	        </div>
+		  </div>
+
+	  </div>
+
+      <footer>
+		<p role="contentinfo">
+		  Paul Agapow - Proudly powered by <a href="http://alexis.notmyidea.org/pelican/">pelican</a>. Theme <a href="https://github.com/fle/pelican-sober">pelican-sober</a>.
+    	</p>
+
+	  </footer>
+
+	</div>
+
+
+</body>
+</html>

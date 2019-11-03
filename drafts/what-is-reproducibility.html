@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="">
+<head>
+	<meta charset="utf-8"/>
+	<title>What is reproducibility? - Make More Machines</title>
+	<meta name="author" content="Paul Agapow">
+
+
+  <meta name="description" content="[Based in part on a long-lost article I wrote on Biocoders / CodersCrowd] One of my long running issues is reproducibility in bioinformatics, driven pragmatically by needs at the analysis / research coalface. But while examining some relevant tools, I got to thinking about what a broad term “reproducibility" is". In fact …">
+
+	<meta name="twitter:card" content="summary">
+	  <meta name="twitter:creator" content="@agapow">
+	<meta name="twitter:title" content="What is reproducibility?">
+	<meta name="twitter:description" content="[Based in part on a long-lost article I wrote on Biocoders / CodersCrowd] One of my long running issues is reproducibility in bioinformatics, driven pragmatically by needs at the analysis / research coalface. But while examining some relevant tools, I got to thinking about what a broad term “reproducibility" is". In fact …">
+	<meta name="twitter:url" content="http://www.agapow.net/drafts/what-is-reproducibility.html">
+
+
+	<link rel="stylesheet" href="http://www.agapow.net/theme/css/main.css" type="text/css" />
+
+
+
+    <link href="http://www.agapow.net/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Make More Machines Atom Feed" />
+</head>
+
+<body>
+
+    <div class="container">
+
+	  <header role="banner">
+	    <div class="feeds">
+	      <a href="http://www.agapow.net/feeds/all.atom.xml" rel="alternate"><img src="http://www.agapow.net/theme/images/icons/feed-32px.png" alt="atom feed"/></a>
+	    </div>
+	      <nav class="pages">
+			  <a href="http://www.agapow.net/about">About</a>
+-			  <a href="http://www.agapow.net/whereabouts">Whereabouts</a>
+	      </nav>
+		<a href="http://www.agapow.net" class="title">Make More Machines</a>&nbsp;&nbsp;(agapow.net)
+      </header>
+
+	  <div class="wrapper">
+
+		  <div role="main" class="content">
+	<article class="full">
+
+		<h1>What is reproducibility?</h1>
+
+<div class="metadata">
+  <time datetime="2016-09-20T16:41:59+01:00" pubdate>2016-09-20</time>
+    <address class="vcard author">
+      by <a class="url fn" href="http://www.agapow.net/False">Paul Agapow</a>
+    </address>
+  in <a href="http://www.agapow.net/science/">science</a>
+<p class="tags">tagged <a href="http://www.agapow.net//by-tag/reproducibility/">reproducibility</a>, <a href="http://www.agapow.net//by-tag/data-science/">data-science</a>, <a href="http://www.agapow.net//by-tag/analysis/">analysis</a></p></div>
+		<div class="summary">No, really, I want to know.</div>
+
+
+      <p>[Based in part on a long-lost article I wrote on Biocoders / CodersCrowd]</p>
+<p>One of my long running issues is reproducibility in bioinformatics, driven pragmatically by needs at the analysis / research coalface. But while  examining some relevant tools, I got to thinking about what a broad term “reproducibility&quot; is&quot;.  In fact, there’s widespread disagreement on what reproducibility (and a whole host of associated terms) actually means. The airless, non-productive arguments that result as people talk past each other are compounded by the wide variety of needs and use cases that that reproducibility fulfils. At least some of these aren't strictly within the domain of reproducibility, but are associated or implied issues.</p>
+<p>So, if I'm interested in &quot;reproducibility&quot; (in the widest and woolliest sense of the word), what am I looking for? What do I need, and what's the most important?</p>
+<p>A useful model to explain and differentiate the terms is to think of every analysis as an operator (analyst, scientist, chemist, etc.) taking data (which may be pure data or physical samples) and using a method (a procedure, laboratory analysis, algorithm or any combination) to get a result (an answer).</p>
+<div class="section" id="the-big-terms">
+<h2>The big terms</h2>
+<div class="section" id="reproducibility-and-repeatability">
+<h3>Reproducibility and repeatability</h3>
+<p><em>What did I do? Can it be repeated?</em></p>
+<p>Given the same data and same method, can a different operator arrive at the same result? Some definitions of reproducibility add the qualifier that the analysis is carried by a different operator, i.e. can someone else arrive at the answer? The essential point is that all aspects of the analysis have been captured so another operator - someone else or just a forgetful you in six months time - can repeat the analysis exactly and get the same result.</p>
+</div>
+<div class="section" id="replicability">
+<h3>Replicability</h3>
+<p><em>Is same result borne out by other experiments?</em></p>
+<p>Does a different operator using different data arrive at the same result? Definitions differ as to whether the method should be the same, but the point is about the wider correctness of any finding: If another research team recruits a similar cohort and analyses them in the same way, do they find the same things? Often, arguments about whether a new analysis repliactes a previous one can be confused  over whether a cohort is the same, and whether tools  are looking at the same thing.</p>
+<p>Note that at least two different scientific &quot;reproducibility&quot; projects are actually about replicability (i.e. they're repeating experiemnts with new subjects) and there’s one prominent paper on the subject that uses the reverse the sense of &quot;reproducibility&quot; and &quot;replicability&quot; to everyone else.</p>
+</div>
+</div>
+<div class="section" id="reliability">
+<h2>Reliability</h2>
+<p><em>Will this give me the same answer?</em></p>
+<p>If the analysis is repeated, with the same data, do you get the same answer? While this is more obviously relevant to laboratory prcedures (which have natural variation due to the multitide of possible real world factors), computational</p>
+<p>agreement</p>
+<div class="section" id="repeatability">
+<h3>Repeatability</h3>
+<p>foo</p>
+</div>
+<div class="section" id="ruggedness-and-robustness">
+<h3>Ruggedness and robustness</h3>
+<p><em>Is this going to work next time? Is this going to work for someone else?</em></p>
+<p>The ruggedness of an analysis is its ability to produce the same result regardless of small variations. For example, in laboratory science, does the same data give the same result regardless of different laboratories, different analysts, different instruments, different batches of reagents, different
+days, etc. Put another way, it's about practical reliability under normal use allowing for realistic (and uncontrollable) variations.</p>
+<p>Robustness is almost always treated as a synonym. Statistics also uses <em>robust</em> to refer to assunmptions and approaches that work over a wide range of data.</p>
+<p>Robustness of a system has been defined as 'a property that allows a system to maintain its functions against internal and external perturbations'</p>
+</div>
+<div class="section" id="accuracy">
+<h3>Accuracy</h3>
+<p><em>Is the result actually correct?</em></p>
+<p>corecet</p>
+</div>
+</div>
+<div class="section" id="association-words">
+<h2>Association words</h2>
+<p>Self Documentation</p>
+<p>What did I do?</p>
+<p>This is the broadest and arguably most important service of repro-tools, even if (strictly speaking) it's only an incidental property of reproducibility. How can analysts see what they did, long after the fact: What data did I use? What did I do with it? What parameters did I use? It's the same issue programming code style and commenting is aimed at: what does this do and how does it do it?</p>
+<p>In principle, there's nothing here that couldn't be fulfilled by a lab notebook. In practice, we are all vulnerable to omission, ranging from making &quot;just one small change&quot; to hacking away for hours until something works. For documentation to be complete, to work, it must require little effort, be &quot;frictionless&quot;, or be recorded automatically as a side-effect of analysis efforts.</p>
+<p>As said, documentation is an almost incidental property of repro tools: if you have to construct a pipeline, make a replicable analysis, etc., you almost necessarily have to capture what you did. But how easy is it to interpret this captured process? Is it through reading the code that did the analysis? Is it through interpreting a makefile? (Scons &amp; Madagscar) Is it through studying the analysis history (Galaxy) or the report docs (knitr)? Mileage varies greatly.</p>
+<p>Summary: vital and vital to get right.</p>
+<p>Reporting</p>
+<p>What did you do?</p>
+<p>A.k.a. &quot;Tell your boss what you did&quot;. How can you generate an attractive summary of results, perhaps with some details of how they were arrived at? Obviously, you could always just write a Word doc, write some background and paste in some pictures, but it would be handy and less error prone to have this generated from the analysis process, in a way that's analogous to literate programming. Such summaries would be useful not just for management, but also for producing annotated results to send to collaborators, or even for your own use.</p>
+<p>This is actually one of the less common features of repro tools, R's sweave and knitr being the most common examples. An more extreme example is Madagascar's &quot;generatable papers&quot; feature, where there are a number of geophysics papers that were entirely made in the system. As clever as that is, I wonder if that's not taking things too far. A publication is often justa fragment of a larger project and the act of writing a paper is often about deciding what to include and what to leave out.</p>
+<p>Summary: nice to have but not essential</p>
+<p>Replication</p>
+<p>Do exactly this again</p>
+<p>A.k.a. &quot;How do I know you got the results you did?&quot; In theory, this is the most important point of reproducibility - demonstrate that your results were made the way you said they were made by allowing others to see and reproduce what you did.  I admit to a touch of cynicism about this point, wondering about how many others will actually bother to replicate your workflow and whether this might ignore the more important distortions that may occur before analysis (e.g. selection of data and analysis methods). But it is an important principle, that your analysis should be able to be replicated, even if that might never be asked.</p>
+<p>Summary: important, if only in principle</p>
+<p>Repetition</p>
+<p>Oops, lets do this again</p>
+<p>My choice of terms is suspect, but what I'm getting at is one of the most common tasks in bioinformatics - do an analysis again, but with a slight change. Drop a contaminating sequence. Add in those few extra reads that just came off the sequencer. Change the window size parameter. How do you repeat essentially the same analysis with minor variations, doing it &quot;right this time&quot;? From talking to colleagues, repeating things with minor tweaks seems to occupy much of our working hours. I'd consider that this may be the most important aspect of a reporducibility tool.</p>
+<p>Summary: pragmatically important, almost essential.</p>
+<p>Reuse - &quot;Do this again with this data&quot;</p>
+<p>Pipelines</p>
+<p>I want to do this same sequence of steps with different datasets</p>
+<p>If your analysis consists of a single step, there's probably no little for reproducibility. The issue only becomes important with complex, multi-step analyses, so a need for reproducibility implies an analysis pipeline. However, in turn pipelines will usually imply at least Repetition and probably Reuse.</p>
+<p>Dependency Tracking and Efficiency</p>
+<p>Do this sequence of steps as few times as possible</p>
+<p>Summary: not important but nice to have</p>
+<p>Data Protection</p>
+<p>I don't want to accidentally delete my data</p>
+<p>Summary</p>
+<p>Data Management</p>
+<p>Organise my datasets</p>
+<p>A wider use case of data protection: datasets must be managed. These means keeping them in a central location (or at least recording their location centrally)</p>
+<p>Centralized Capture</p>
+<p>Keep everything together</p>
+<p>Keep all steps of the analysis in one place</p>
+<p>Conclusion</p>
+<p>References</p>
+<ul class="simple">
+<li>Snakemake: a bioinformatics makefiel system</li>
+<li>Madagascar:</li>
+<li>Bein</li>
+<li>Scons</li>
+<li>CRAN task view: reproducibility</li>
+</ul>
+<p>(Reshaped from an article written on Biocodershub some years ago. The original article has gone missing, so here's a recapitulation and rethinking of the same ideas.)</p>
+<p>One of my long running causes is reproducibility in bioinformatics, driven pragmatically by needs at the analysis coalface. But while recently examining some reproducibility tools, I got to thinking about what a broad term &quot;reproducibility&quot; is. While there are many and legion arguments about what it is (vs. &quot;replicability&quot; and other terms), in practice I suspect it actual encompases a great many needs, use cases and problems. This variation doesn't help repro efforts: one solution may service entire different needs to another.</p>
+<p>So, if I'm interested in &quot;reproducibility&quot; - in the widest and wooliest sense of the word - what am I looking for? What do I need, what's are the important features any tools should have?</p>
+</div>
+<div class="section" id="self-documentation">
+<h2>Self documentation</h2>
+<p>a.k.a. <em>What did I do?</em></p>
+<p>This is the broadest and arguably most important service of repro-tools, even if (strictly speaking) it's only an incidental property of reproducibility, what i sometimes refer to as &quot;small r&quot; reproducibility. How can analysts see what they did, long after the fact: What data was used? Whatwas doen with it? What parameters were used? It's the same issue programming code style and commenting is aimed at: what does this do and how does it do it?</p>
+<p>In principle, there's nothing here that couldn't be fulfilled by a lab notebook. In practice, we are all vulnerable to omission, ranging from making &quot;just one small change&quot; to hacking away for hours until something works. For documentation to be complete, to work, it must require little effort, be &quot;frictionless&quot;, or be recorded automatically as a side-effect of analysis efforts.</p>
+<p>As said, documentation is an almost incidental property of repro tools: if you have to construct a pipeline, make a replicable analysis, etc., you almost necessarily have to capture what you did. But how easy is it to interpret this captured process? Is it only through reading the code that did the analysis? Is it through interpreting a makefile? (c.v. Scons &amp; Madagscar) Is it through studying the analysis history (c.v. Galaxy) or the report docs (c.v. knitr)? Mileage varies greatly.</p>
+</div>
+<div class="section" id="reporting">
+<h2>Reporting</h2>
+<p>a.k.a. <em>What did you do?</em></p>
+<p>Or &quot;Tell your boss what you did&quot; or &quot;Show your work&quot;. As is common in the data science and business intelligence worlds, how can you generate an attractive summary of results, perhaps with some details of how they were arrived at? Obviously, you could always just write a Word doc, write some background and paste in some pictures, but it would be handy and less error prone to have this generated from the analysis process, in a way that's analogous to literate programming. Such summaries would be useful not just for management, but also for producing annotated results to send to collaborators, or even for your own use.</p>
+<p>This is actually one of the less common features of repro tools, R's sweave and knitr being the most common examples. An more extreme example is Madagascar's &quot;generatable papers&quot; feature, where there are a number of geophysics papers that were entirely made in the system. As clever as that is, I wonder if that's not taking things too far. A publication is often just a fragment of a larger project and the act of writing a paper is often about deciding what to include and what to leave out.</p>
+</div>
+<div class="section" id="replication">
+<h2>Replication</h2>
+<p>a.k.a. <em>Do exactly this again</em></p>
+<p>Or &quot;How do I know you got the results you did?&quot; How can some external observer see that your results were generated in the way you say they were. I remain conflicted by this need. Anyone who has worked in science knows about data being massaged and results that are not reproducible. But in practice, I wonder how many others will actually bother to replicate your workflow and whether this might ignore the more important distortions that may occur before analysis (e.g. selection of data and analysis methods). But it is an important principle, that your analysis should be able to be replicated, even if that might never be attempted.</p>
+<p>... Despite the high profile of &quot;big R&quot; reprocubility efforts in a few quarters (virtual machine or docker environments, putting everything in a public guthub repository, computable papares) and the real pressing concersn this addresses in practuce I suspect there is low demand for this. Most practionares don't have the time and won't spend a second on efforts that don't address their own problems.</p>
+</div>
+<div class="section" id="repetition">
+<h2>Repetition</h2>
+<p>a.k.a. <em>Oops, lets do this again</em></p>
+<p>My choice of terms is suspect, but what I'm getting at is one of the most common tasks in bioinformatics - do an analysis again, but with a slight change. Drop a contaminating sequence / add in those few extra reads that just came off the sequencer / change the window size parameter. How do you repeat essentially the same analysis with minor variations, &quot;doing it right this time&quot;? From talking to colleagues, repeating things with minor tweaks seems to occupy much of our working hours. I'd consider that this may be the most important aspect of a reproducibility tool.</p>
+<p>Of course, this is what scripting an analysis is all about, and any decent analyst will know how to script external programs, feeding data to them and capturing the results. There are points of vulnerability: what do you do with unscriptable steps (e.g. some that involve GUI or unscriptable programs) or &quot;soft&quot; analysis and judgement calls (e.g. eyeball the alignment for quality, check the data for outliers to decide the next step). I've sometimes wished repro-workflows had a &quot;human intervention&quot; step or module:</p>
+<blockquote>
+Look at the data. If it passes muster, click &quot;go ahead&quot;. Otherwise ...</blockquote>
+</div>
+<div class="section" id="reuse">
+<h2>Reuse</h2>
+<p>a.k.a. <em>Do this again with this data</em></p>
+<p>In a sense, this is just a wider version of <em>repetition</em>: allow the analysis to be run again with differebt datasets and parameters.</p>
+</div>
+<div class="section" id="pipelines">
+<h2>Pipelines</h2>
+<p><em>I want to do this sequence of steps with a different dataset</em></p>
+<p>If your analysis consists of a single step, there's probably no little for reproducibility. The issue only becomes important with complex, multi-step analyses, so a need for reproducibility implies an analysis pipeline. However, in turn pipelines will usually imply at least Repetition and probably Reuse.</p>
+</div>
+<div class="section" id="dependency-tracking-and-efficiency">
+<h2>Dependency Tracking and Efficiency</h2>
+<p>redo this efficinetly</p>
+<p><em>Do this sequence of steps as few times as possible</em></p>
+<p>Summary: not important but nice to have</p>
+</div>
+<div class="section" id="data-protection">
+<h2>Data Protection</h2>
+<p>Reassure me my data is safe</p>
+<p>I don't want to accidentally delete my data</p>
+<p>Summary</p>
+</div>
+<div class="section" id="data-management">
+<h2>Data Management</h2>
+<p>Organise my datasets</p>
+<p>A wider use case of data protection: datasets must be managed. These means keeping them in a central location (or at least recording their location centrally)</p>
+</div>
+<div class="section" id="centralized-capture">
+<h2>Centralized Capture</h2>
+<p>Keep everything together</p>
+<p>Keep all steps of the analysis in one place</p>
+<p>References</p>
+<p>Snakemake: a bioinformatics makefiel system
+Madagascar:
+Bein
+Scons
+CRAN task view: reproducibility</p>
+</div>
+
+
+	</article>
+
+    <p>
+	<a href="https://twitter.com/share" class="twitter-share-button" data-via="" data-lang="en" data-size="large" data-related="">Tweet</a>
+	<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+	</p>
+
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = 'agapow';
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
+		  </div>
+
+		  <div class="sidebar">
+		    <div class="sidebar-container" >
+
+
+	            <aside>
+	              <h2>About</h2>
+			      <p class='summary'>
+                  This site has just been restored, with most of the content
+						translated automatically from its old form. Expect bugs,
+						missing information and general wierdness as things
+						get sorted out.
+			      </p>
+			    </aside>
+
+
+  	          <nav>
+	            <h2>Categories</h2>
+	            <ul>
+	                <li ><a href="http://www.agapow.net/misc/">misc</a></li>
+	                <li ><a href="http://www.agapow.net/personal/">personal</a></li>
+	                <li ><a href="http://www.agapow.net/programming/">programming</a></li>
+	                <li ><a href="http://www.agapow.net/publications/">publications</a></li>
+	                <li class="active"><a href="http://www.agapow.net/science/">science</a></li>
+	                <li ><a href="http://www.agapow.net/software/">software</a></li>
+	                <li ><a href="http://www.agapow.net/talks/">talks</a></li>
+	            </ul>
+
+	            <ul>
+	              <li><a href="http://www.agapow.net/tags.html">all tags</a></li>
+	            </ul>
+	          </nav>
+
+	            <aside>
+	            <h2>Social</h2>
+			      <ul class="social">
+				    <li><a href="http://twitter.com/agapow">Twitter</a><i></i></li>
+				    <li><a href="http://github.com/agapow">Github</a><i></i></li>
+				    <li><a href="https://plus.google.com/u/0/113920832845886210876/posts">Google+</a><i></i></li>
+				    <li><a href="http://uk.linkedin.com/pub/paul-michael-agapow/2/15b/184/">linkedIn</a><i></i></li>
+			      </ul>
+			    </aside>
+
+	            <aside>
+	              <h2>Links</h2>
+	              <ul>
+	                  <li><a href="http://www.imperial.ac.uk/data-science/">IC Data Science Institute</a></li>
+	                  <li><a href="http://www.meetup.com/Bioinformatics-London">Bioinformatics London</a></li>
+	              </ul>
+	            </aside>
+
+<a class="twitter-timeline" data-dnt="true" href="https://twitter.com/agapow" data-widget-id="336428520026812416">Tweets by @agapow</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+	        </div>
+		  </div>
+
+	  </div>
+
+      <footer>
+		<p role="contentinfo">
+		  Paul Agapow - Proudly powered by <a href="http://alexis.notmyidea.org/pelican/">pelican</a>. Theme <a href="https://github.com/fle/pelican-sober">pelican-sober</a>.
+    	</p>
+
+	  </footer>
+
+	</div>
+
+
+</body>
+</html>
